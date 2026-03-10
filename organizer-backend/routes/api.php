@@ -19,7 +19,18 @@ use App\Http\Controllers\Api\CardCommentController;
 use App\Http\Controllers\Api\CardActivityController;
 use App\Http\Controllers\Api\RoleController;
 
+
+use App\Http\Controllers\Api\EtiquetaController;
+use App\Http\Controllers\Api\PrioridadController;
+use App\Http\Controllers\Api\TareaController;
+
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::apiResource('tareas', TareaController::class);
+Route::patch('tareas/{tarea}/estado', [TareaController::class, 'cambiarEstado']);
+
+Route::get('prioridades', [PrioridadController::class, 'index']);
+Route::get('etiquetas', [EtiquetaController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
