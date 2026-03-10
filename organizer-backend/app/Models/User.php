@@ -3,97 +3,116 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
-    public const ROLE_ADMIN = 1;
-    public const ROLE_OPERADOR = 2;
-    public const ROLE_CONSULTA = 3;
-    public const ROLE_AUDITORIA = 4;
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name',
         'email',
-        'role',
-        'avatar_path',
         'password',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    protected function casts(): array
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Un usuario tiene un rol principal vía tabla pivote.
+     */
+    public function roles(): BelongsToMany
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'role' => 'integer',
-        ];
+        return $this->belongsToMany(Role::class, 'role_user')
+            ->withTimestamps();
+    }
+
+    /**
+     * Devuelve el primer rol asociado.
+     */
+    public function primaryRole(): ?Role
+    {
+        return $this->roles->first();
+    }
+
+    /**
+     * Accessor práctico para frontend/resources.
+     */
+    public function getRoleIdAttribute(): ?int
+    {
+        return $this->roles->first()?->id;
+    }
+
+    public function getRoleSlugAttribute(): ?string
+    {
+        return $this->roles->first()?->slug;
+    }
+
+    public function getRoleNameAttribute(): ?string
+    {
+        return $this->roles->first()?->name;
+    }
+
+    /**
+     * Helpers de autorización simples.
+     */
+    public function hasRole(string $slug): bool
+    {
+        return $this->roles->contains(fn (Role $role) => $role->slug === $slug);
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasRoleId(self::ROLE_ADMIN);
+        return $this->hasRole('admin');
     }
 
-    public function roles(): BelongsToMany
+    public function isOperator(): bool
     {
-        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id')->withTimestamps();
+        return $this->hasRole('operador');
     }
 
-    public function roleId(): int
+    public function isConsulta(): bool
     {
-        if ($this->relationLoaded('roles')) {
-            $fromRelation = (int) ($this->roles->sortBy('id')->first()?->id ?? 0);
-            if ($fromRelation > 0) return $fromRelation;
-        } else {
-            $fromRelation = (int) ($this->roles()->orderBy('roles.id')->value('roles.id') ?? 0);
-            if ($fromRelation > 0) return $fromRelation;
-        }
-
-        return (int) ($this->role ?? self::ROLE_OPERADOR);
+        return $this->hasRole('consulta');
     }
 
-    public function roleName(): string
+    public function isAuditoria(): bool
     {
-        if ($this->relationLoaded('roles')) {
-            $name = (string) ($this->roles->sortBy('id')->first()?->name ?? '');
-            if ($name !== '') return $name;
-        } else {
-            $name = (string) ($this->roles()->orderBy('roles.id')->value('roles.name') ?? '');
-            if ($name !== '') return $name;
-        }
-
-        return self::roleLabelFromId($this->roleId());
+        return $this->hasRole('auditoria');
     }
 
-    public static function roleLabelFromId(int $id): string
+    /**
+     * Opcional: si después asignás tareas a usuarios.
+     */
+    public function tareasAsignadas()
     {
-        return match ($id) {
-            self::ROLE_ADMIN => 'Administrador',
-            self::ROLE_OPERADOR => 'Operador',
-            self::ROLE_CONSULTA => 'Consulta',
-            self::ROLE_AUDITORIA => 'Auditoria',
-            default => 'Sin rol',
-        };
-    }
-
-    private function hasRoleId(int $roleId): bool
-    {
-        if ($this->relationLoaded('roles')) {
-            if ($this->roles->contains(fn ($r) => (int) ($r->id ?? 0) === $roleId)) return true;
-        } else {
-            if ($this->roles()->where('roles.id', $roleId)->exists()) return true;
-        }
-
-        return (int) ($this->role ?? 0) === $roleId;
+        return $this->hasMany(Tarea::class, 'assigned_user_id');
     }
 }

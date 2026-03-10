@@ -26,16 +26,21 @@ use App\Http\Controllers\Api\TareaController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResource('tareas', TareaController::class);
-Route::patch('tareas/{tarea}/estado', [TareaController::class, 'cambiarEstado']);
-
-Route::get('prioridades', [PrioridadController::class, 'index']);
-Route::get('etiquetas', [EtiquetaController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/me/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('tareas', TareaController::class);
+    Route::patch('tareas/{tarea}/estado', [TareaController::class, 'cambiarEstado']);
+
+    Route::get('prioridades', [PrioridadController::class, 'index']);
+    Route::get('etiquetas', [EtiquetaController::class, 'index']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/me/change-password', [AuthController::class, 'changePassword']);
 
     Route::get('/admin/users', [AdminUserController::class, 'index']);
     Route::post('/admin/users', [AdminUserController::class, 'store']);
