@@ -44,43 +44,6 @@ class User extends Authenticatable
         return $this->hasRoleId(self::ROLE_ADMIN);
     }
 
-    public function canManageBoards(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN) || $this->hasRoleId(self::ROLE_OPERADOR);
-    }
-
-    public function canManageColumns(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN) || $this->hasRoleId(self::ROLE_OPERADOR);
-    }
-
-    public function canWriteCards(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN)
-            || $this->hasRoleId(self::ROLE_OPERADOR)
-            || $this->hasRoleId(self::ROLE_CONSULTA);
-    }
-
-    public function canDeleteCards(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN) || $this->hasRoleId(self::ROLE_OPERADOR);
-    }
-
-    public function canManageCards(): bool
-    {
-        return $this->canWriteCards(); // compat
-    }
-
-    public function canManageUsers(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN);
-    }
-
-    public function canReadAudit(): bool
-    {
-        return $this->hasRoleId(self::ROLE_ADMIN) || $this->hasRoleId(self::ROLE_AUDITORIA);
-    }
-
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id')->withTimestamps();
@@ -132,17 +95,5 @@ class User extends Authenticatable
         }
 
         return (int) ($this->role ?? 0) === $roleId;
-    }
-
-    public function boards(): BelongsToMany
-    {
-        return $this->belongsToMany(Board::class, 'board_user', 'user_id', 'board_id')
-            ->withPivot(['is_favorite'])
-            ->withTimestamps();
-    }
-
-    public function cards(): BelongsToMany
-    {
-        return $this->belongsToMany(Card::class, 'card_user', 'user_id', 'card_id')->withTimestamps();
     }
 }
