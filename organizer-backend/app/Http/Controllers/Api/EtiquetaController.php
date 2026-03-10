@@ -20,12 +20,12 @@ class EtiquetaController extends Controller
     {
         $etiquetas = $this->etiquetaService->listar();
 
-        return response()->json([
-            'message' => $etiquetas->isNotEmpty()
+        return $this->successResponse(
+            EtiquetaResource::collection($etiquetas),
+            $etiquetas->isNotEmpty()
                 ? 'Etiquetas obtenidas correctamente.'
-                : 'No se encontraron etiquetas.',
-            'data' => EtiquetaResource::collection($etiquetas),
-        ]);
+                : 'No se encontraron etiquetas.'
+        );
     }
 
     /**

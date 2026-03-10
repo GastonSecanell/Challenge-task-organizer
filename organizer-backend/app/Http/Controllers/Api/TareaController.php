@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CambiarEstadoTareaRequest;
 use App\Http\Requests\StoreTareaRequest;
 use App\Http\Requests\UpdateTareaRequest;
-use App\Http\Requests\CambiarEstadoTareaRequest;
 use App\Http\Resources\TareaResource;
 use App\Models\Tarea;
 use App\Services\TareaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 class TareaController extends Controller
 {
     public function __construct(
@@ -35,12 +34,12 @@ class TareaController extends Controller
 
         $tareas = $this->tareaService->listar($filtros);
 
-        return response()->json([
-            'message' => $tareas->total() > 0
+        return $this->paginatedResponse(
+            TareaResource::collection($tareas->items()),
+            $tareas->total() > 0
                 ? 'Tareas obtenidas correctamente.'
                 : 'No se encontraron tareas.',
-            'data' => TareaResource::collection($tareas->items()),
-            'paginacion' => [
+            [
                 'pagina_actual' => $tareas->currentPage(),
                 'por_pagina' => $tareas->perPage(),
                 'total' => $tareas->total(),
@@ -48,8 +47,8 @@ class TareaController extends Controller
                 'desde' => $tareas->firstItem(),
                 'hasta' => $tareas->lastItem(),
             ],
-            'filtros' => $filtros,
-        ]);
+            $filtros
+        );
     }
     /**
      * Store a newly created resource in storage.
@@ -58,10 +57,11 @@ class TareaController extends Controller
     {
         $tarea = $this->tareaService->crear($request->validated());
 
-        return response()->json([
-            'message' => 'Tarea creada correctamente.',
-            'data' => new TareaResource($tarea),
-        ], 201);
+        return $this->successResponse(
+            new TareaResource($tarea),
+            'Tarea creada correctamente.',
+            201
+        );
     }
     /**
      * Display the specified resource.
@@ -71,10 +71,10 @@ class TareaController extends Controller
     {
         $tarea = $this->tareaService->obtener($tarea);
 
-        return response()->json([
-            'message' => 'Tarea obtenida correctamente.',
-            'data' => new TareaResource($tarea),
-        ]);
+        return $this->successResponse(
+            new TareaResource($tarea),
+            'Tarea obtenida correctamente.'
+        );
     }
     /**
      * Update the specified resource in storage.
@@ -83,10 +83,10 @@ class TareaController extends Controller
     {
         $tarea = $this->tareaService->actualizar($tarea, $request->validated());
 
-        return response()->json([
-            'message' => 'Tarea actualizada correctamente.',
-            'data' => new TareaResource($tarea),
-        ]);
+        return $this->successResponse(
+            new TareaResource($tarea),
+            'Tarea actualizada correctamente.'
+        );
     }
     /**
      * Remove the specified resource from storage.
@@ -95,10 +95,10 @@ class TareaController extends Controller
     {
         $this->tareaService->eliminar($tarea);
 
-        return response()->json([
-            'message' => 'Tarea eliminada correctamente.',
-            'data' => null,
-        ]);
+        return $this->successResponse(
+            null,
+            'Tarea eliminada correctamente.'
+        );
     }
 
     public function cambiarEstado(CambiarEstadoTareaRequest $request, Tarea $tarea): JsonResponse

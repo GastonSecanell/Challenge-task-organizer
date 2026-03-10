@@ -20,12 +20,12 @@ class PrioridadController extends Controller
     {
         $prioridades = $this->prioridadService->listar();
 
-        return response()->json([
-            'message' => $prioridades->isNotEmpty()
+        return $this->successResponse(
+            PrioridadResource::collection($prioridades),
+            $prioridades->isNotEmpty()
                 ? 'Prioridades obtenidas correctamente.'
-                : 'No se encontraron prioridades.',
-            'data' => PrioridadResource::collection($prioridades),
-        ]);
+                : 'No se encontraron prioridades.'
+        );
     }
 
     /**

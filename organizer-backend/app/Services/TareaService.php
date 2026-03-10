@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tarea;
 use App\Repositories\TareaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class TareaService
 {
@@ -20,16 +21,16 @@ class TareaService
 
     public function crear(array $data): Tarea
     {
-        $etiquetas = $data['etiquetas'] ?? [];
-        unset($data['etiquetas']);
+        return DB::transaction(function () use ($data) {
+            $etiquetas = $data['etiquetas'] ?? [];
+            unset($data['etiquetas']);
 
-        $tarea = $this->tareaRepository->crear($data);
+            $tarea = $this->tareaRepository->crear($data);
 
-        if (!empty($etiquetas)) {
             $this->tareaRepository->sincronizarEtiquetas($tarea, $etiquetas);
-        }
 
-        return $this->tareaRepository->cargarRelaciones($tarea);
+            return $this->tareaRepository->cargarRelaciones($tarea);
+        });
     }
 
     public function obtener(Tarea $tarea): Tarea
@@ -39,26 +40,32 @@ class TareaService
 
     public function actualizar(Tarea $tarea, array $data): Tarea
     {
-        $etiquetas = $data['etiquetas'] ?? [];
-        unset($data['etiquetas']);
+        return DB::transaction(function () use ($tarea, $data) {
+            $etiquetas = $data['etiquetas'] ?? [];
+            unset($data['etiquetas']);
 
-        $tarea = $this->tareaRepository->actualizar($tarea, $data);
-        $this->tareaRepository->sincronizarEtiquetas($tarea, $etiquetas);
+            $tarea = $this->tareaRepository->actualizar($tarea, $data);
+            $this->tareaRepository->sincronizarEtiquetas($tarea, $etiquetas);
 
-        return $this->tareaRepository->cargarRelaciones($tarea);
+            return $this->tareaRepository->cargarRelaciones($tarea);
+        });
     }
 
     public function cambiarEstado(Tarea $tarea, string $estado): Tarea
     {
-        $tarea = $this->tareaRepository->actualizar($tarea, [
-            'estado' => $estado,
-        ]);
+        return DB::transaction(function () use ($tarea, $estado) {
+            $tarea = $this->tareaRepository->actualizar($tarea, [
+                'estado' => $estado,
+            ]);
 
-        return $this->tareaRepository->cargarRelaciones($tarea);
+            return $this->tareaRepository->cargarRelaciones($tarea);
+        });
     }
 
     public function eliminar(Tarea $tarea): bool
     {
-        return $this->tareaRepository->eliminar($tarea);
+        return DB::transaction(function () use ($tarea) {
+            return $this->tareaRepository->eliminar($tarea);
+        });
     }
 }

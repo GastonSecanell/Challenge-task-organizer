@@ -5,8 +5,13 @@ namespace App\Repositories;
 use App\Models\Tarea;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class TareaRepository
+class TareaRepository extends BaseRepository
 {
+    public function __construct(Tarea $model)
+    {
+        parent::__construct($model);
+    }
+
     public function listar(array $filtros = []): LengthAwarePaginator
     {
         $porPagina = (int) ($filtros['por_pagina'] ?? 10);
@@ -20,7 +25,8 @@ class TareaRepository
             $ordenarPor = 'id';
         }
 
-        return Tarea::query()
+        return $this->model
+            ->newQuery()
             ->with(['prioridad', 'etiquetas'])
             ->busqueda($filtros['busqueda'] ?? null)
             ->porEstado($filtros['estado'] ?? null)
@@ -35,18 +41,18 @@ class TareaRepository
 
     public function crear(array $data): Tarea
     {
-        return Tarea::create($data);
+        return $this->create($data);
     }
 
     public function actualizar(Tarea $tarea, array $data): Tarea
     {
-        $tarea->update($data);
-        return $tarea;
+        /** @var Tarea $tarea */
+        return $this->update($tarea, $data);
     }
 
     public function eliminar(Tarea $tarea): bool
     {
-        return (bool) $tarea->delete();
+        return $this->delete($tarea);
     }
 
     public function sincronizarEtiquetas(Tarea $tarea, array $etiquetas): void
