@@ -1,5 +1,7 @@
 import './assets/main.css'
-import './lib/material'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -17,10 +19,7 @@ app.use(pinia)
 
 initHttp({
     getToken: () => useAuthStore(pinia).token,
-    // baseURL: '' // si después querés prefijo global
 })
-console.log('BASE_URL FRONT:', import.meta.env.BASE_URL)
-console.log('API URL:', import.meta.env.VITE_API_URL)
 useThemeStore(pinia)
 
 app.use(router)
