@@ -22,4 +22,15 @@ export const TareasApi = {
     return http.delete(`/api/tareas/${id}`).then(r => r.data)
   },
 
+  changePriority(id, payload) {
+    return http.patch(`/api/tareas/${id}/prioridad`, payload).then(r => r.data)
+  },
+
+  changeStatus(id, payload) {
+    return http.patch(`/api/tareas/${id}/estado`, payload).then(r => r.data)
+  },
+
+  updateEtiquetas(id, payload) {
+    return http.patch(`/api/tareas/${id}/etiquetas`, payload).then(r => r.data)
+  }
 }

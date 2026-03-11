@@ -118,7 +118,7 @@ function updateFilter(key, value) {
         <BaseSelectRole
           :model-value="filters.role_id"
           :roles="roles"
-          class-name="w-[320px]"
+          class-name="w-[420px]"
           @update:model-value="updateFilter('role_id', $event)"
         />
       </div>

@@ -68,4 +68,23 @@ class TareaService
             return $this->tareaRepository->eliminar($tarea);
         });
     }
+
+    public function sincronizarEtiquetas(Tarea $tarea, array $etiquetas): Tarea
+    {
+        return DB::transaction(function () use ($tarea, $etiquetas) {
+            $this->tareaRepository->sincronizarEtiquetas($tarea, $etiquetas);
+            return $this->tareaRepository->cargarRelaciones($tarea);
+        });
+    }
+
+    public function cambiarPrioridad(Tarea $tarea, int $prioridadId): Tarea
+    {
+        return DB::transaction(function () use ($tarea, $prioridadId) {
+            $tarea = $this->tareaRepository->actualizar($tarea, [
+                'prioridad_id' => $prioridadId,
+            ]);
+
+            return $this->tareaRepository->cargarRelaciones($tarea);
+        });
+    }
 }

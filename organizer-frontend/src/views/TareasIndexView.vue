@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import TareasTable from '@/components/tareas/TareasTable.vue'
-import UsersPagination from '@/components/users/UsersPagination.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
 import TareaFormModal from '@/components/tareas/TareaFormModal.vue'
 import { useToastStore } from '@/stores/toasts'
 import { TareasApi } from '@/lib/api/tareas'
@@ -168,6 +168,26 @@ async function handleDelete(item) {
   }
 }
 
+async function handleChangePriority({ id, prioridad_id }) {
+  try {
+    await TareasApi.changePriority(id, { prioridad_id })
+    toasts.success('Prioridad actualizada.')
+    await fetchTareas()
+  } catch (error) {
+    toasts.error(error?.message || 'No se pudo actualizar la prioridad.')
+  }
+}
+
+async function handleChangeStatus({ id, estado }) {
+  try {
+    await TareasApi.changeStatus(id, { estado })
+    toasts.success('Estado actualizado.')
+    await fetchTareas()
+  } catch (error) {
+    toasts.error(error?.message || 'No se pudo actualizar el estado.')
+  }
+}
+
 onMounted(async () => {
   await fetchPrioridades()
   await fetchTareas()
@@ -199,9 +219,12 @@ onMounted(async () => {
       @sort="updateSort"
       @edit="openEdit"
       @delete="handleDelete"
+      @change-priority="handleChangePriority"
+      @change-status="handleChangeStatus"
+      @labels-updated="fetchTareas"
     />
 
-    <UsersPagination
+    <BasePagination
       :page="paginacion.pagina_actual"
       :per-page="paginacion.por_pagina"
       :total="paginacion.total"

@@ -34,6 +34,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('tareas', TareaController::class);
     Route::patch('tareas/{tarea}/estado', [TareaController::class, 'cambiarEstado']);
+    Route::patch('/tareas/{tarea}/etiquetas', [TareaController::class, 'syncEtiquetas']);
+    Route::patch('/tareas/{tarea}/prioridad', [TareaController::class, 'cambiarPrioridad']);
 
     Route::get('prioridades', [PrioridadController::class, 'index']);
     Route::get('etiquetas', [EtiquetaController::class, 'index']);

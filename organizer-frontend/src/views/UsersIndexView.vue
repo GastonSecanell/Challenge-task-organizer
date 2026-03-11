@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import UsersTable from "@/components/users/UsersTable.vue";
-import UsersPagination from "@/components/users/UsersPagination.vue";
+import BasePagination from "@/components/ui/BasePagination.vue";
 import UserFormModal from "@/components/users/UserFormModal.vue";
 import { useToastStore } from "@/stores/toasts";
 import { UsersApi } from "@/lib/api/users";
@@ -197,7 +197,7 @@ onMounted(async () => {
       @delete="handleDelete"
     />
 
-    <UsersPagination
+    <BasePagination
       :page="paginacion.pagina_actual"
       :per-page="paginacion.por_pagina"
       :total="paginacion.total"

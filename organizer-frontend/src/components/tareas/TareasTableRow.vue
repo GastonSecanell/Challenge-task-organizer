@@ -1,7 +1,11 @@
 <script setup>
 import { Pencil, Trash2 } from 'lucide-vue-next'
+import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
+import TaskEtiquetasDropdown from './TaskEtiquetasDropdown.vue'
+import TaskEstadoDropdown from './TaskEstadoDropdown.vue'
+import TaskPrioridadDropdown from './TaskPrioridadDropdown.vue'
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true,
@@ -10,9 +14,19 @@ defineProps({
     type: Number,
     default: 0,
   },
+  prioridades: {
+    type: Array,
+    default: () => [],
+  },
 })
 
-defineEmits(['edit', 'delete'])
+const emit = defineEmits([
+  'edit',
+  'delete',
+  'change-status',
+  'change-priority',
+  'labels-updated',
+])
 
 function rowClass(index) {
   return index % 2 === 0
@@ -20,10 +34,18 @@ function rowClass(index) {
     : 'bg-[var(--bg-row-even)] hover:bg-[var(--bg-hover)]'
 }
 
-function estadoLabel(estado) {
-  if (estado === 'en_progreso') return 'En progreso'
-  if (estado === 'completada') return 'Completada'
-  return 'Pendiente'
+function handleChangeStatus(estado) {
+  emit('change-status', {
+    id: props.item.id,
+    estado,
+  })
+}
+
+function handleChangePriority(prioridadId) {
+  emit('change-priority', {
+    id: props.item.id,
+    prioridad_id: prioridadId,
+  })
 }
 </script>
 
@@ -42,13 +64,46 @@ function estadoLabel(estado) {
     </td>
 
     <td class="px-4 py-3 text-sm text-[var(--text-secondary)]">
-      {{ item.prioridad?.prioridad || '-' }}
+      <TaskPrioridadDropdown
+        :value="item.prioridad"
+        :prioridades="prioridades"
+        @change="handleChangePriority"
+      />
     </td>
 
-    <td class="px-4 py-3 text-sm text-[var(--text-secondary)]">
-      <span class="inline-flex items-center rounded-full border border-[var(--border-default)] px-2.5 py-1 text-xs text-[var(--text-primary)]">
-        {{ estadoLabel(item.estado) }}
-      </span>
+    <td class="px-4 py-3">
+      <div class="flex items-start gap-2">
+        <div class="flex flex-wrap gap-1.5 min-w-[120px]">
+          <span
+            v-for="etiqueta in item.etiquetas"
+            :key="etiqueta.id"
+            class="inline-flex items-center rounded-full border px-1 py-1 text-xs font-medium"
+            :class="getEtiquetaStyle(etiqueta.etiqueta).badge"
+          >
+            {{ etiqueta.etiqueta }}
+          </span>
+
+          <span
+            v-if="!item.etiquetas?.length"
+            class="text-xs text-[var(--text-muted)]"
+          >
+            Sin etiquetas
+          </span>
+        </div>
+        
+        <TaskEtiquetasDropdown
+          :tarea-id="item.id"
+          :selected-etiquetas="item.etiquetas"
+          @updated="$emit('labels-updated')"
+        />
+      </div>
+    </td>
+
+    <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+      <TaskEstadoDropdown
+        :value="item.estado"
+        @change="handleChangeStatus"
+      />
     </td>
 
     <td class="px-4 py-3 text-sm text-[var(--text-secondary)]">

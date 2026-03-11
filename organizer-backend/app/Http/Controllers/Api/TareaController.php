@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CambiarEstadoTareaRequest;
+use App\Http\Requests\CambiarPrioridadTareaRequest;
 use App\Http\Requests\StoreTareaRequest;
+use App\Http\Requests\SyncEtiquetasTareaRequest;
 use App\Http\Requests\UpdateTareaRequest;
 use App\Http\Resources\TareaResource;
 use App\Models\Tarea;
@@ -111,4 +113,31 @@ class TareaController extends Controller
             'data' => new TareaResource($tarea),
         ]);
     }
+
+    public function cambiarPrioridad(CambiarPrioridadTareaRequest $request, Tarea $tarea): JsonResponse
+    {
+        $tarea = $this->tareaService->cambiarPrioridad(
+            $tarea,
+            (int) $request->validated()['prioridad_id']
+        );
+
+        return $this->successResponse(
+            new TareaResource($tarea),
+            'Prioridad de la tarea actualizada correctamente.'
+        );
+    }
+
+    public function syncEtiquetas(SyncEtiquetasTareaRequest $request, Tarea $tarea): JsonResponse
+    {
+        $tarea = $this->tareaService->sincronizarEtiquetas(
+            $tarea,
+            $request->validated()['etiquetas'] ?? []
+        );
+
+        return $this->successResponse(
+            new TareaResource($tarea),
+            'Etiquetas actualizadas correctamente.'
+        );
+    }
+
 }

@@ -1,6 +1,5 @@
 <script setup>
-import { Search, Trash2, Plus, Minus } from 'lucide-vue-next'
-import BaseSelectRole from '@/components/ui/BaseSelectRole.vue'
+import { Search, Trash2, Plus, Minus, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
   search: {
@@ -91,16 +90,22 @@ function updateFilter(key, value) {
         class="flex items-center gap-4 overflow-hidden transition-[max-height,opacity] duration-300"
         :class="showFilters ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'"
       >
-        <select
-          :value="filters.estado"
-          :class="[inputBase, 'w-[180px]']"
-          @change="updateFilter('estado', $event.target.value)"
-        >
-          <option value="">Todos los estados</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="en_progreso">En progreso</option>
-          <option value="completada">Completada</option>
-        </select>
+        <div class="relative w-[180px]">
+          <select
+            :value="filters.estado"
+            :class="[inputBase, 'appearance-none pr-8']"
+            @change="updateFilter('estado', $event.target.value)"
+          >
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="completada">Completada</option>
+          </select>
+
+          <ChevronDown
+            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
+          />
+        </div>
 
         <div class="relative w-[220px]">
           <select
@@ -117,6 +122,10 @@ function updateFilter(key, value) {
               {{ prioridad.prioridad }}
             </option>
           </select>
+
+          <ChevronDown
+            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
+          />
         </div>
 
         <input
