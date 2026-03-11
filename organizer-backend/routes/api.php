@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\EtiquetaController;
 use App\Http\Controllers\Api\PrioridadController;
 use App\Http\Controllers\Api\TareaController;
+use App\Http\Controllers\Api\UserController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -39,13 +40,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
 
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{user}', [UserController::class, 'show']);
+    Route::post('users', [UserController::class, 'store']);
+    Route::put('users/{user}', [UserController::class, 'update']);
+    Route::delete('users/{user}', [UserController::class, 'destroy']);
+    Route::get('/roles', [RoleController::class, 'index']);
+
+
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/me/change-password', [AuthController::class, 'changePassword']);
 
     Route::get('/admin/users', [AdminUserController::class, 'index']);
     Route::post('/admin/users', [AdminUserController::class, 'store']);
     Route::put('/admin/users/{user}', [AdminUserController::class, 'update']);
-    Route::get('/roles', [RoleController::class, 'index']);
 
     Route::get('/audit', [AuditController::class, 'index']);
 

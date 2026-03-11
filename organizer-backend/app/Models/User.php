@@ -48,10 +48,9 @@ class User extends Authenticatable
     /**
      * Un usuario tiene un rol principal vía tabla pivote.
      */
-    public function roles(): BelongsToMany
+    public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user')
-            ->withTimestamps();
+        return $this->belongsToMany(Role::class, 'role_user')->withTimestamps();
     }
 
     /**

@@ -69,6 +69,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $status = $e->getStatusCode();
+
             $mensaje = 'Ocurrió un error en la solicitud.';
 
             if ($e instanceof NotFoundHttpException) {
