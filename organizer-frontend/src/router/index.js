@@ -4,8 +4,8 @@ import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
 import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
-import TareasView from '@/views/TareasView.vue'
-//import TareaFormView from '@/views/TareaFormView.vue'
+import TareasView from '@/views/TareasIndexView.vue'
+import UsersIndexView from '@/views/UsersIndexView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,30 +22,20 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: '', redirect: '/dashboard' },
-
         {
           path: 'dashboard',
           name: 'dashboard',
           component: DashboardView,
         },
-
         {
           path: 'tareas',
           name: 'tareas.index',
           component: TareasView,
         },
-
         {
-          path: 'tareas/nueva',
-          name: 'tareas.create',
-          //component: TareaFormView,
-        },
-
-        {
-          path: 'tareas/:id/editar',
-          name: 'tareas.edit',
-          //component: TareaFormView,
-          props: true,
+          path: 'usuarios',
+          name: 'usuarios.index',
+          component: UsersIndexView,
         },
       ],
     },

@@ -15,7 +15,7 @@ export const TareasApi = {
   },
 
   update(id, payload) {
-    return http.put(`/api/tareas/${id}`, payload).then(r => r.data)
+    return http.patch(`/api/tareas/${id}`, payload).then(r => r.data)
   },
 
   remove(id) {
