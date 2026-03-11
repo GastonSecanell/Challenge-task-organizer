@@ -13,9 +13,30 @@ class UserService
         private UserRepository $repository
     ) {}
 
-    public function list(array $filters)
+    public function list(array $filters): array
     {
-        return $this->repository->paginate($filters);
+        $paginator = $this->repository->paginate($filters);
+
+        return [
+            'items' => $paginator->items(),
+            'filtros' => [
+                'por_pagina' => (int) ($filters['por_pagina'] ?? 10),
+                'busqueda' => $filters['busqueda'] ?? null,
+                'name' => $filters['name'] ?? null,
+                'email' => $filters['email'] ?? null,
+                'role_id' => $filters['role_id'] ?? null,
+                'ordenar_por' => $filters['ordenar_por'] ?? 'id',
+                'direccion' => $filters['direccion'] ?? 'desc',
+            ],
+            'paginacion' => [
+                'pagina_actual' => $paginator->currentPage(),
+                'por_pagina' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'ultima_pagina' => $paginator->lastPage(),
+                'desde' => $paginator->firstItem() ?? 0,
+                'hasta' => $paginator->lastItem() ?? 0,
+            ],
+        ];
     }
 
     public function create(array $data): User

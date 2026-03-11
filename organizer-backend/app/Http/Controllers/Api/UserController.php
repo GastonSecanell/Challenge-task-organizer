@@ -18,9 +18,14 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = $this->userService->list($request->all());
+        $resultado = $this->userService->list($request->all());
 
-        return UserResource::collection($users);
+        return response()->json([
+            'message' => 'Usuarios obtenidos correctamente.',
+            'data' => UserResource::collection($resultado['items']),
+            'filtros' => $resultado['filtros'],
+            'paginacion' => $resultado['paginacion'],
+        ]);
     }
 
     public function show(User $user)

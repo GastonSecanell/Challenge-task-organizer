@@ -23,6 +23,7 @@ class TareaController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filtros = [
+            'pagina' => $request->get('pagina', 1),
             'por_pagina' => $request->get('por_pagina', 10),
             'busqueda' => $request->get('busqueda'),
             'estado' => $request->get('estado'),

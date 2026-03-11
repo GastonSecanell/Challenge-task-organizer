@@ -10,10 +10,12 @@ class UserRepository
     {
         $query = User::query()->with('roles');
 
-        if (!empty($filters['search'])) {
-            $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('email', 'like', '%' . $filters['search'] . '%');
+        if (!empty($filters['busqueda'])) {
+            $busqueda = $filters['busqueda'];
+
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('name', 'like', "%{$busqueda}%")
+                  ->orWhere('email', 'like', "%{$busqueda}%");
             });
         }
 
@@ -33,7 +35,21 @@ class UserRepository
             });
         }
 
-        return $query->paginate($filters['per_page'] ?? 10);
+        $ordenarPor = $filters['ordenar_por'] ?? 'id';
+        $direccion = $filters['direccion'] ?? 'desc';
+        $porPagina = (int) ($filters['por_pagina'] ?? 10);
+        $pagina = (int) ($filters['pagina'] ?? 1);
+
+        $columnasPermitidas = ['id', 'name', 'email', 'created_at', 'updated_at'];
+        if (!in_array($ordenarPor, $columnasPermitidas, true)) {
+            $ordenarPor = 'id';
+        }
+
+        $direccion = strtolower($direccion) === 'asc' ? 'asc' : 'desc';
+
+        return $query
+            ->orderBy($ordenarPor, $direccion)
+            ->paginate($porPagina, ['*'], 'page', $pagina);
     }
 
     public function findById(int $id): ?User

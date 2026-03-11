@@ -14,9 +14,9 @@ class TareaRepository extends BaseRepository
 
     public function listar(array $filtros = []): LengthAwarePaginator
     {
+        $pagina = (int) ($filtros['pagina'] ?? 1);
         $porPagina = (int) ($filtros['por_pagina'] ?? 10);
         $porPagina = $porPagina > 0 ? min($porPagina, 100) : 10;
-
         $ordenarPorPermitidos = ['id', 'titulo', 'estado', 'fecha_vencimiento', 'created_at'];
         $ordenarPor = $filtros['ordenar_por'] ?? 'id';
         $direccion = strtolower($filtros['direccion'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
@@ -35,7 +35,7 @@ class TareaRepository extends BaseRepository
                 : null)
             ->porFechaVencimiento($filtros['fecha_vencimiento'] ?? null)
             ->orderBy($ordenarPor, $direccion)
-            ->paginate($porPagina)
+            ->paginate($porPagina, ['*'], 'page', $pagina)
             ->appends($filtros);
     }
 
