@@ -249,6 +249,7 @@ onMounted(async () => {
       v-if="auth.canManageUsers"
       :open="modalOpen"
       :user-id="selectedId"
+      :roles="roles"
       @close="closeModal"
       @saved="handleSaved"
     />

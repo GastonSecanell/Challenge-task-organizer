@@ -44,9 +44,7 @@
   --chart-direct: #28e384;
   --chart-track: rgba(255, 255, 255, 0.18);
 
-  /* =====================
-     TASK LABELS / BADGES
-  ===================== */
+  /* Task Labels /Badges */
   --task-label-blue-bg: rgba(59, 130, 246, 0.1);
   --task-label-blue-border: rgba(59, 130, 246, 0.3);
   --task-label-blue-text: #93c5fd;
@@ -77,9 +75,7 @@
   --task-label-slate-text: #cbd5e1;
   --task-label-slate-accent: #94a3b8;
 
-  /* =====================
-     TASK STATUS
-  ===================== */
+  /* Task Status */
   --task-status-pending-bg: rgba(148, 163, 184, 0.1);
   --task-status-pending-border: rgba(148, 163, 184, 0.3);
   --task-status-pending-text: #cbd5e1;
@@ -92,9 +88,7 @@
   --task-status-done-border: rgba(16, 185, 129, 0.3);
   --task-status-done-text: #6ee7b7;
 
-  /* =====================
-     TASK PRIORITY
-  ===================== */
+  /* Task Priority */
   --task-priority-low-bg: rgba(56, 189, 248, 0.1);
   --task-priority-low-border: rgba(56, 189, 248, 0.3);
   --task-priority-low-text: #7dd3fc;
@@ -107,9 +101,7 @@
   --task-priority-high-border: rgba(239, 68, 68, 0.3);
   --task-priority-high-text: #fca5a5;
 
-  /* =====================
-     TASK DUE DATE
-  ===================== */
+  /* Task Due Date */
   --task-due-far-text: #86efac;
   --task-due-far-bg: rgba(16, 185, 129, 0.1);
   --task-due-far-border: rgba(16, 185, 129, 0.25);
@@ -131,9 +123,7 @@
   --task-due-overdue-border: rgba(220, 38, 38, 0.35);
 }
 
-/* =====================
-   LIGHT
-===================== */
+/* Light Theme */
 :root[data-theme="light"] {
   --bg-page: #eaeaeb;
   --bg-surface: #ffffff;
@@ -171,9 +161,7 @@
   --chart-direct: #22c55e;
   --chart-track: rgba(0, 0, 0, 0.12);
 
-  /* =====================
-     TASK LABELS / BADGES
-  ===================== */
+  /* Task Labels / Badges */
   --task-label-blue-bg: rgba(59, 130, 246, 0.08);
   --task-label-blue-border: rgba(59, 130, 246, 0.22);
   --task-label-blue-text: #1d4ed8;
@@ -204,9 +192,7 @@
   --task-label-slate-text: #475569;
   --task-label-slate-accent: #64748b;
 
-  /* =====================
-     TASK STATUS
-  ===================== */
+  /* Task Status */
   --task-status-pending-bg: rgba(148, 163, 184, 0.1);
   --task-status-pending-border: rgba(148, 163, 184, 0.22);
   --task-status-pending-text: #475569;
@@ -219,9 +205,7 @@
   --task-status-done-border: rgba(16, 185, 129, 0.22);
   --task-status-done-text: #047857;
 
-  /* =====================
-     TASK PRIORITY
-  ===================== */
+  /* Task Priority */
   --task-priority-low-bg: rgba(56, 189, 248, 0.1);
   --task-priority-low-border: rgba(56, 189, 248, 0.22);
   --task-priority-low-text: #0369a1;
@@ -234,9 +218,7 @@
   --task-priority-high-border: rgba(239, 68, 68, 0.22);
   --task-priority-high-text: #b91c1c;
 
-  /* =====================
-     TASK DUE DATE
-  ===================== */
+  /* Task Due Date */
   --task-due-far-text: #15803d;
   --task-due-far-bg: rgba(34, 197, 94, 0.08);
   --task-due-far-border: rgba(34, 197, 94, 0.2);
@@ -258,9 +240,7 @@
   --task-due-overdue-border: rgba(220, 38, 38, 0.24);
 }
 
-/* =====================
-   BASE
-===================== */
+/* Base */
 html,
 body {
   background: var(--bg-page);
@@ -271,9 +251,7 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* =====================
-   SCROLLBAR (dark)
-===================== */
+/* Scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
@@ -337,6 +315,32 @@ select {
   color-scheme: dark;
 }
 
+input[type="date"] {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(62%) sepia(48%) saturate(538%) hue-rotate(200deg);
+}
+
+input[type="date"]:hover {
+  border-color: var(--accent);
+}
+
+input[type="date"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input[type="date"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] input[type="date"] {
+  color-scheme: light;
+}
+
 .base-select {
   position: relative;
   width: 100%;
@@ -391,10 +395,7 @@ select {
   stroke-width: 1.8;
 }
 
-
-/* =====================
-   TASK DESCRIPTION VIEW
-===================== */
+/* Task Description View */
 .task-description-view {
   min-height: 180px;
   line-height: 1.6;
@@ -533,10 +534,7 @@ select {
   margin-left: 12rem;
 }
 
-
-/* =====================
-   TASK QUILL EDITOR
-===================== */
+/* Task Quill Editor */
 .task-quill-editor .ql-toolbar {
   border: 0;
   border-bottom: 1px solid var(--border-default);

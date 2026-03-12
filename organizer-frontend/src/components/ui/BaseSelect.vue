@@ -39,7 +39,16 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change'])
 
 function onChange(event) {
-  const value = event.target.value
+  const rawValue = event.target.value
+
+  const selectedOption = props.options.find(
+    (option) => String(option[props.optionValue]) === rawValue
+  )
+
+  const value = selectedOption
+    ? selectedOption[props.optionValue]
+    : rawValue
+
   emit('update:modelValue', value)
   emit('change', value)
 }

@@ -3,9 +3,9 @@ import { computed, reactive, ref, watch } from 'vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import { useToastStore } from '@/stores/toasts'
 import { UsersApi } from '@/lib/api/users'
-import { RolesApi } from '@/lib/api/roles'
 
 const props = defineProps({
   open: {
@@ -15,6 +15,10 @@ const props = defineProps({
   userId: {
     type: [Number, String, null],
     default: null,
+  },
+  roles: {
+    type: Array,
+    default: () => [],
   },
 })
 
@@ -118,11 +122,6 @@ function validate() {
   return valid
 }
 
-async function loadRoles() {
-  const res = await RolesApi.list()
-  roles.value = res?.data ?? []
-}
-
 async function loadUser(id) {
   const res = await UsersApi.get(id)
   const user = res?.data ?? null
@@ -145,7 +144,7 @@ async function initModal() {
   resetForm()
 
   try {
-    await loadRoles()
+    roles.value = props.roles
 
     if (props.userId) {
       await loadUser(props.userId)
@@ -246,19 +245,15 @@ watch(
         <label class="mb-1 block text-sm text-[var(--text-secondary)]">
           Rol
         </label>
-        <select
+
+        <BaseSelect
           v-model="form.role_id"
-          class="w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-page)] px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-        >
-          <option value="">Seleccionar rol</option>
-          <option
-            v-for="role in roles"
-            :key="role.id"
-            :value="role.id"
-          >
-            {{ role.name }}
-          </option>
-        </select>
+          :options="roles"
+          option-label="name"
+          option-value="id"
+          placeholder="Seleccionar rol"
+        />
+
         <p v-if="errors.role_id" class="mt-1 text-xs text-[var(--danger)]">
           {{ errors.role_id }}
         </p>

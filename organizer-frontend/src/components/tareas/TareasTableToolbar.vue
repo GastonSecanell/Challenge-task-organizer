@@ -135,11 +135,11 @@ function updateFilter(key, value) {
           />
         </div>
 
-        <div class="w-[150px] shrink-0">
+        <div class="relative w-[200px] shrink-0">
           <input
             :value="filters.fecha_vencimiento"
             type="date"
-            :class="[inputBase, 'w-full min-w-0']"
+            :class="[inputBase, 'pr-9']"
             @input="updateFilter('fecha_vencimiento', $event.target.value)"
           />
         </div>
