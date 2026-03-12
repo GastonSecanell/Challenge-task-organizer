@@ -1,10 +1,12 @@
 <script setup>
-import { Search, Trash2, Plus, Minus, ChevronDown } from 'lucide-vue-next'
+import { Search, Trash2, Plus, Minus } from "lucide-vue-next";
+import BaseSelect from "@/components/ui/BaseSelect.vue";
+import { TASK_ESTADO_FILTER_OPTIONS } from "@/lib/taskEstados";
 
 const props = defineProps({
   search: {
     type: String,
-    default: '',
+    default: "",
   },
   filters: {
     type: Object,
@@ -37,31 +39,35 @@ const props = defineProps({
   etiquetas: {
     type: Array,
     default: () => [],
-  }
-})
+  },
+});
 
 const emit = defineEmits([
-  'update:search',
-  'update:filters',
-  'update:showFilters',
-  'resetFilters',
-])
+  "update:search",
+  "update:filters",
+  "update:showFilters",
+  "resetFilters",
+]);
 
 const inputBase =
-  'h-9 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30'
+  "h-9 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30";
 
 function updateFilter(key, value) {
-  emit('update:filters', {
+  emit("update:filters", {
     ...props.filters,
     [key]: value,
-  })
+  });
 }
 </script>
 
 <template>
   <div class="border-b border-[var(--border-default)] px-4 py-6 lg:px-8">
-    <div class="grid items-center gap-4 lg:grid-cols-[auto_260px_auto_1fr_auto_auto]">
-      <h1 class="whitespace-nowrap text-xl font-bold text-[var(--text-primary)]">
+    <div
+      class="grid items-center gap-4 lg:grid-cols-[auto_260px_auto_1fr_auto_auto]"
+    >
+      <h1
+        class="whitespace-nowrap text-xl font-bold text-[var(--text-primary)]"
+      >
         Tareas
       </h1>
 
@@ -73,7 +79,7 @@ function updateFilter(key, value) {
           class="pl-9"
           :class="inputBase"
           @input="$emit('update:search', $event.target.value)"
-        >
+        />
         <Search
           class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]"
           aria-hidden="true"
@@ -95,61 +101,37 @@ function updateFilter(key, value) {
         :class="showFilters ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'"
       >
         <div class="relative w-[170px] shrink-0">
-          <select
-            :value="filters.estado"
-            :class="[inputBase, 'appearance-none pr-8']"
-            @change="updateFilter('estado', $event.target.value)"
-          >
-            <option value="">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en_progreso">En progreso</option>
-            <option value="completada">Completada</option>
-          </select>
+          <div class="relative w-[170px] shrink-0">
+            <BaseSelect
+              :model-value="filters.estado"
+              :options="TASK_ESTADO_FILTER_OPTIONS"
+              option-label="label"
+              option-value="value"
+              placeholder="Todos los estados"
+              @update:modelValue="updateFilter('estado', $event)"
+            />
+          </div>
+        </div>
 
-          <ChevronDown
-            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
+        <div class="relative w-[190px] shrink-0">
+          <BaseSelect
+            :model-value="filters.prioridad_id"
+            :options="prioridades"
+            option-label="prioridad"
+            option-value="id"
+            placeholder="Todas las prioridades"
+            @update:modelValue="updateFilter('prioridad_id', $event)"
           />
         </div>
 
         <div class="relative w-[190px] shrink-0">
-          <select
-            :value="filters.prioridad_id"
-            :class="[inputBase, 'appearance-none pr-8']"
-            @change="updateFilter('prioridad_id', $event.target.value)"
-          >
-            <option value="">Todas las prioridades</option>
-            <option
-              v-for="prioridad in prioridades"
-              :key="prioridad.id"
-              :value="prioridad.id"
-            >
-              {{ prioridad.prioridad }}
-            </option>
-          </select>
-
-          <ChevronDown
-            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
-          />
-        </div>
-
-        <div class="relative w-[190px] shrink-0">
-          <select
-            :value="filters.etiqueta_id"
-            :class="[inputBase, 'appearance-none pr-8']"
-            @change="updateFilter('etiqueta_id', $event.target.value)"
-          >
-            <option value="">Todas las etiquetas</option>
-            <option
-              v-for="etiqueta in etiquetas"
-              :key="etiqueta.id"
-              :value="etiqueta.id"
-            >
-              {{ etiqueta.etiqueta }}
-            </option>
-          </select>
-
-          <ChevronDown
-            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
+          <BaseSelect
+            :model-value="filters.etiqueta_id"
+            :options="etiquetas"
+            option-label="etiqueta"
+            option-value="id"
+            placeholder="Todas las etiquetas"
+            @update:modelValue="updateFilter('etiqueta_id', $event)"
           />
         </div>
 
@@ -159,7 +141,7 @@ function updateFilter(key, value) {
             type="date"
             :class="[inputBase, 'w-full min-w-0']"
             @input="updateFilter('fecha_vencimiento', $event.target.value)"
-          >
+          />
         </div>
       </div>
 

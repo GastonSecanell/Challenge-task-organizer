@@ -1,10 +1,11 @@
 <script setup>
 import { Eye, Pencil, Trash2 } from 'lucide-vue-next'
-import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
 import TaskEtiquetasDropdown from './TaskEtiquetasDropdown.vue'
 import TaskEstadoDropdown from './TaskEstadoDropdown.vue'
 import TaskPrioridadDropdown from './TaskPrioridadDropdown.vue'
 import { getDueDateClass, getDueDateLabel } from '@/lib/taskDueDate'
+import { getEstadoClass, getEstadoLabel } from '@/lib/taskEstados'
+import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
 
 const props = defineProps({
   item: {
@@ -68,28 +69,6 @@ function prioridadLabel(prioridad) {
   return prioridad.prioridad || 'Sin prioridad'
 }
 
-function estadoLabel(estado) {
-  if (estado === 'pendiente') return 'Pendiente'
-  if (estado === 'en_progreso') return 'En progreso'
-  if (estado === 'completada') return 'Completada'
-  return estado || '-'
-}
-
-function estadoBadgeClass(estado) {
-  if (estado === 'pendiente') {
-    return 'border-[var(--task-status-pending-border)] bg-[var(--task-status-pending-bg)] text-[var(--task-status-pending-text)]'
-  }
-
-  if (estado === 'en_progreso') {
-    return 'border-[var(--task-status-progress-border)] bg-[var(--task-status-progress-bg)] text-[var(--task-status-progress-text)]'
-  }
-
-  if (estado === 'completada') {
-    return 'border-[var(--task-status-done-border)] bg-[var(--task-status-done-bg)] text-[var(--task-status-done-text)]'
-  }
-
-  return 'border-[var(--border-default)] bg-[var(--bg-hover)] text-[var(--text-secondary)]'
-}
 </script>
 
 <template>
@@ -163,9 +142,9 @@ function estadoBadgeClass(estado) {
       <span
         v-else
         class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
-        :class="estadoBadgeClass(item.estado)"
+        :class="getEstadoClass(item.estado)"
       >
-        {{ estadoLabel(item.estado) }}
+        {{ getEstadoLabel(item.estado) }}
       </span>
     </td>
 

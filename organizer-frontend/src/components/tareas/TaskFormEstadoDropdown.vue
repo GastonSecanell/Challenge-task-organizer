@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
-import { getEstadoClass, getEstadoLabel } from '@/lib/taskEstados'
+import { TASK_ESTADOS, getEstadoClass, getEstadoShortLabel } from '@/lib/taskEstados'
 
 const props = defineProps({
   modelValue: {
@@ -29,11 +29,7 @@ const position = ref({
   left: 0,
 })
 
-const options = [
-  { value: 'pendiente', label: 'PENDIENTE' },
-  { value: 'en_progreso', label: 'EN PROGRESO' },
-  { value: 'completada', label: 'COMPLETADA' },
-]
+const options = TASK_ESTADOS
 
 const triggerClass = computed(() => {
   return [
@@ -147,7 +143,7 @@ onBeforeUnmount(() => {
         class="inline-flex min-w-[124px] items-center justify-center rounded-full border px-3 py-1.5 text-xs font-semibold"
         :class="getEstadoClass(modelValue)"
       >
-        {{ getEstadoLabel(modelValue) }}
+        {{ getEstadoShortLabel(modelValue) }}
       </span>
 
       <ChevronDown class="h-4 w-4 text-[var(--text-secondary)]" />
@@ -171,13 +167,13 @@ onBeforeUnmount(() => {
           class="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-sm transition hover:bg-[var(--bg-hover)]"
           @click="selectEstado(option.value)"
         >
-          <span class="text-[var(--text-primary)]">{{ option.label }}</span>
+          <span class="text-[var(--text-primary)]">{{ option.shortLabel }}</span>
 
           <span
             class="inline-flex min-w-[108px] items-center justify-center rounded-full border px-2.5 py-1 text-[11px] font-semibold"
             :class="getEstadoClass(option.value)"
           >
-            {{ option.label }}
+            {{ option.shortLabel }}
           </span>
         </button>
       </div>
