@@ -1,3 +1,5 @@
+export const DEFAULT_TASK_ESTADO = 'pendiente'
+
 export const TASK_ESTADOS = [
   {
     value: 'pendiente',
@@ -21,7 +23,6 @@ export const TASK_ESTADOS = [
       'border-[var(--task-status-done-border)] bg-[var(--task-status-done-bg)] text-[var(--task-status-done-text)]',
   },
 ]
-
 export const TASK_ESTADO_FILTER_OPTIONS = [
   { value: '', label: 'Todos los estados' },
   ...TASK_ESTADOS.map((item) => ({

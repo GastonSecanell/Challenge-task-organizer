@@ -8,7 +8,7 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 
 import { useToastStore } from "@/stores/toasts";
 import { TareasApi } from "@/lib/api/tareas";
-import { isValidEstado } from "@/lib/taskEstados";
+import { isValidEstado, DEFAULT_TASK_ESTADO } from "@/lib/taskEstados";
 
 import TaskFormEstadoDropdown from "./TaskFormEstadoDropdown.vue";
 import TaskFormPrioridadDropdown from "./TaskFormPrioridadDropdown.vue";
@@ -40,7 +40,7 @@ const isSaving = ref(false);
 const form = reactive({
   titulo: "",
   descripcion: "<p><br></p>",
-  estado: "pendiente",
+  estado: DEFAULT_TASK_ESTADO,
   fecha_vencimiento: "",
   prioridad_id: "",
   etiquetas: [],
@@ -91,7 +91,7 @@ function resetErrors() {
 function resetForm() {
   form.titulo = "";
   form.descripcion = "<p><br></p>";
-  form.estado = "pendiente";
+  form.estado = DEFAULT_TASK_ESTADO;
   form.fecha_vencimiento = "";
   form.prioridad_id = "";
   form.etiquetas = [];
@@ -202,7 +202,7 @@ async function loadTarea(id) {
 
   form.titulo = tarea?.titulo ?? "";
   form.descripcion = tarea?.descripcion ?? "";
-  form.estado = tarea?.estado ?? "pendiente";
+  form.estado = tarea?.estado ?? DEFAULT_TASK_ESTADO;
   form.fecha_vencimiento = formatDateForInput(tarea?.fecha_vencimiento ?? "");
   form.prioridad_id = tarea?.prioridad_id ? Number(tarea.prioridad_id) : "";
   form.etiquetas = Array.isArray(tarea?.etiquetas)
