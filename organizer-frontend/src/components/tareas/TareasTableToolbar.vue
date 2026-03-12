@@ -34,6 +34,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  etiquetas: {
+    type: Array,
+    default: () => [],
+  }
 })
 
 const emit = defineEmits([
@@ -90,7 +94,7 @@ function updateFilter(key, value) {
         class="flex items-center gap-4 overflow-hidden transition-[max-height,opacity] duration-300"
         :class="showFilters ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'"
       >
-        <div class="relative w-[180px]">
+        <div class="relative w-[170px] shrink-0">
           <select
             :value="filters.estado"
             :class="[inputBase, 'appearance-none pr-8']"
@@ -107,7 +111,7 @@ function updateFilter(key, value) {
           />
         </div>
 
-        <div class="relative w-[220px]">
+        <div class="relative w-[190px] shrink-0">
           <select
             :value="filters.prioridad_id"
             :class="[inputBase, 'appearance-none pr-8']"
@@ -128,12 +132,35 @@ function updateFilter(key, value) {
           />
         </div>
 
-        <input
-          :value="filters.fecha_vencimiento"
-          type="date"
-          :class="[inputBase, 'w-[180px]']"
-          @input="updateFilter('fecha_vencimiento', $event.target.value)"
-        >
+        <div class="relative w-[190px] shrink-0">
+          <select
+            :value="filters.etiqueta_id"
+            :class="[inputBase, 'appearance-none pr-8']"
+            @change="updateFilter('etiqueta_id', $event.target.value)"
+          >
+            <option value="">Todas las etiquetas</option>
+            <option
+              v-for="etiqueta in etiquetas"
+              :key="etiqueta.id"
+              :value="etiqueta.id"
+            >
+              {{ etiqueta.etiqueta }}
+            </option>
+          </select>
+
+          <ChevronDown
+            class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--chart-organic)]"
+          />
+        </div>
+
+        <div class="w-[150px] shrink-0">
+          <input
+            :value="filters.fecha_vencimiento"
+            type="date"
+            :class="[inputBase, 'w-full min-w-0']"
+            @input="updateFilter('fecha_vencimiento', $event.target.value)"
+          >
+        </div>
       </div>
 
       <button

@@ -4,6 +4,7 @@ import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
 import TaskEtiquetasDropdown from './TaskEtiquetasDropdown.vue'
 import TaskEstadoDropdown from './TaskEstadoDropdown.vue'
 import TaskPrioridadDropdown from './TaskPrioridadDropdown.vue'
+import { getDueDateClass, getDueDateLabel } from '@/lib/taskDueDate'
 
 const props = defineProps({
   item: {
@@ -15,6 +16,10 @@ const props = defineProps({
     default: 0,
   },
   prioridades: {
+    type: Array,
+    default: () => [],
+  },
+  etiquetas: {
     type: Array,
     default: () => [],
   },
@@ -47,6 +52,7 @@ function handleChangePriority(prioridadId) {
     prioridad_id: prioridadId,
   })
 }
+
 </script>
 
 <template>
@@ -54,16 +60,17 @@ function handleChangePriority(prioridadId) {
     class="animate-row-enter border-t border-[var(--border-default)] transition-colors"
     :class="rowClass(index)"
   >
-    <td class="px-4 py-3">
+    <td class="w-[40%] px-4 py-3">
       <div class="font-medium text-[var(--text-primary)]">
         {{ item.titulo }}
       </div>
-      <div class="mt-1 line-clamp-1 text-xs text-[var(--text-secondary)]">
-        {{ item.descripcion || 'Sin descripción' }}
-      </div>
+      <div
+        class="mt-1 text-xs text-[var(--text-secondary)] line-clamp-1 prose prose-sm max-w-none"
+        v-html="item.descripcion || 'Sin descripción'"
+      ></div>
     </td>
 
-    <td class="px-4 py-3 text-sm text-[var(--text-secondary)]">
+    <td class="px-4 py-3 align-middle">
       <TaskPrioridadDropdown
         :value="item.prioridad"
         :prioridades="prioridades"
@@ -73,7 +80,7 @@ function handleChangePriority(prioridadId) {
 
     <td class="px-4 py-3">
       <div class="flex items-start gap-2">
-        <div class="flex flex-wrap gap-1.5 min-w-[120px]">
+        <div class="flex min-w-[120px] flex-wrap gap-1.5">
           <span
             v-for="etiqueta in item.etiquetas"
             :key="etiqueta.id"
@@ -90,30 +97,37 @@ function handleChangePriority(prioridadId) {
             Sin etiquetas
           </span>
         </div>
-        
+
         <TaskEtiquetasDropdown
           :tarea-id="item.id"
           :selected-etiquetas="item.etiquetas"
+          :etiquetas-disponibles="etiquetas"
           @updated="$emit('labels-updated')"
         />
       </div>
     </td>
 
-    <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+    <td class="px-4 py-3 align-middle">
       <TaskEstadoDropdown
         :value="item.estado"
         @change="handleChangeStatus"
       />
     </td>
 
-    <td class="px-4 py-3 text-sm text-[var(--text-secondary)]">
-      {{ item.fecha_vencimiento || '-' }}
+    <td class="px-4 py-3">
+      <span
+        class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+        :class="getDueDateClass(item.fecha_vencimiento)"
+      >
+        {{ getDueDateLabel(item.fecha_vencimiento) }}
+      </span>
     </td>
 
     <td class="px-2 py-3 text-center">
       <div class="flex justify-center gap-2">
         <button
           class="text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
+          title="Editar tarea"
           @click="$emit('edit', item.id)"
         >
           <Pencil class="h-4 w-4" />
@@ -121,6 +135,7 @@ function handleChangePriority(prioridadId) {
 
         <button
           class="text-[var(--text-secondary)] transition hover:text-red-500"
+          title="Eliminar tarea"
           @click="$emit('delete', item)"
         >
           <Trash2 class="h-4 w-4" />

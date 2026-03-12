@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'Los datos enviados no son válidos.',
                 'errors' => $e->errors(),
-                'codigo' => 422,
+                'status' => 422,
             ], 422);
         });
 
@@ -47,7 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     default => 'El recurso solicitado no fue encontrado.',
                 },
                 'errors' => null,
-                'codigo' => 404,
+                'status' => 404,
             ], 404);
         });
 
@@ -59,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'No autenticado.',
                 'errors' => null,
-                'codigo' => 401,
+                'status' => 401,
             ], 401);
         });
 
@@ -98,7 +98,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => $mensaje,
                 'errors' => null,
-                'codigo' => $status,
+                'status' => $status,
             ], $status);
         });
 
@@ -115,7 +115,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'exception' => class_basename($e),
                     'detalle' => $e->getMessage(),
                 ] : null,
-                'codigo' => 500,
+                'status' => 500,
             ], 500);
         });
     })->create();

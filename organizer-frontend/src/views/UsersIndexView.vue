@@ -4,6 +4,7 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import UsersTable from "@/components/users/UsersTable.vue";
 import BasePagination from "@/components/ui/BasePagination.vue";
 import UserFormModal from "@/components/users/UserFormModal.vue";
+import ConfirmActionModal from "@/components/ui/ConfirmActionModal.vue";
 import { useToastStore } from "@/stores/toasts";
 import { UsersApi } from "@/lib/api/users";
 import { RolesApi } from "@/lib/api/roles";
@@ -37,6 +38,10 @@ const showFilters = ref(false);
 
 const modalOpen = ref(false);
 const selectedId = ref(null);
+
+const confirmDeleteOpen = ref(false);
+const deleting = ref(false);
+const selectedUserToDelete = ref(null);
 
 async function fetchRoles() {
   try {
@@ -111,10 +116,11 @@ function resetFilters() {
 
 function updateSort(column) {
   if (filtros.value.ordenar_por === column) {
-    filtros.value.direccion = filtros.value.direccion === 'asc' ? 'desc' : 'asc';
+    filtros.value.direccion =
+      filtros.value.direccion === "asc" ? "desc" : "asc";
   } else {
     filtros.value.ordenar_por = column;
-    filtros.value.direccion = 'asc';
+    filtros.value.direccion = "asc";
   }
 
   paginacion.value.pagina_actual = 1;
@@ -153,16 +159,34 @@ async function handleSaved() {
   await fetchUsers();
 }
 
-async function handleDelete(user) {
-  const ok = window.confirm(`¿Eliminar a ${user.name}?`);
-  if (!ok) return;
+function handleDelete(user) {
+  selectedUserToDelete.value = user;
+  confirmDeleteOpen.value = true;
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  confirmDeleteOpen.value = false
+  selectedUserToDelete.value = null
+}
+
+async function confirmDelete() {
+  if (!selectedUserToDelete.value?.id) return
+
+  deleting.value = true
 
   try {
-    await UsersApi.remove(user.id);
-    toasts.success("Usuario eliminado correctamente.");
-    await fetchUsers();
+    const res = await UsersApi.remove(selectedUserToDelete.value.id)
+
+    confirmDeleteOpen.value = false
+    selectedUserToDelete.value = null
+
+    toasts.success(res?.message || 'Usuario eliminado correctamente')
+    await fetchUsers()
   } catch {
-    toasts.error("No se pudo eliminar el usuario.");
+    toasts.error("No se pudo eliminar el usuario.")
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -210,6 +234,17 @@ onMounted(async () => {
       :user-id="selectedId"
       @close="closeModal"
       @saved="handleSaved"
+    />
+
+    <ConfirmActionModal
+      :open="confirmDeleteOpen"
+      :is-loading="deleting"
+      title="Eliminar usuario"
+      :message="`Se eliminará el usuario '${selectedUserToDelete?.name || ''}'. Esta acción no se puede deshacer.`"
+      confirm-text="Eliminar"
+      cancel-text="Cancelar"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
     />
   </section>
 </template>

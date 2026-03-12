@@ -1,48 +1,58 @@
 <script setup>
-import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
-import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import { TASK_ESTADOS, getEstadoClass, getEstadoLabel } from '@/lib/taskEstados'
+import { getEstadoClass, getEstadoLabel } from '@/lib/taskEstados'
 
 const props = defineProps({
-  value: {
+  modelValue: {
     type: String,
-    required: true,
+    default: 'pendiente',
+  },
+  error: {
+    type: Boolean,
+    default: false,
   },
 })
 
-const emit = defineEmits(['change'])
+const emit = defineEmits(['update:modelValue'])
 
 const triggerRef = ref(null)
 const panelRef = ref(null)
-
 const isOpen = ref(false)
-const isSaving = ref(false)
 
 const position = ref({
   top: 0,
   left: 0,
 })
 
+const options = [
+  { value: 'pendiente', label: 'PENDIENTE' },
+  { value: 'en_progreso', label: 'EN PROGRESO' },
+  { value: 'completada', label: 'COMPLETADA' },
+]
+
+const triggerClass = computed(() => {
+  return [
+    'inline-flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm transition',
+    props.error
+      ? 'border-red-500/60 ring-2 ring-red-500/15'
+      : 'border-[var(--border-default)] hover:border-[var(--accent)]',
+  ].join(' ')
+})
+
 function calculatePosition() {
   if (!triggerRef.value) return
 
   const rect = triggerRef.value.getBoundingClientRect()
-  const panelWidth = 240
+  const panelWidth = rect.width
   const spacing = 8
 
   let left = rect.left
   let top = rect.bottom + spacing
 
-  const viewportWidth = window.innerWidth
-  const viewportHeight = window.innerHeight
-
-  if (left + panelWidth > viewportWidth - 12) {
-    left = Math.max(12, viewportWidth - panelWidth - 12)
-  }
-
   if (panelRef.value) {
     const panelHeight = panelRef.value.offsetHeight || 0
+    const viewportHeight = window.innerHeight
 
     if (top + panelHeight > viewportHeight - 12) {
       top = Math.max(12, rect.top - panelHeight - spacing)
@@ -71,20 +81,9 @@ async function toggleDropdown() {
   await openDropdown()
 }
 
-async function selectEstado(estado) {
-  if (isSaving.value || estado === props.value) {
-    closeDropdown()
-    return
-  }
-
-  isSaving.value = true
-
-  try {
-    await emit('change', estado)
-    closeDropdown()
-  } finally {
-    isSaving.value = false
-  }
+function selectEstado(value) {
+  emit('update:modelValue', value)
+  closeDropdown()
 }
 
 function handleClickOutside(event) {
@@ -93,14 +92,15 @@ function handleClickOutside(event) {
   const clickedTrigger = triggerRef.value?.contains(event.target)
   const clickedPanel = panelRef.value?.contains(event.target)
 
-  if (clickedTrigger || clickedPanel) return
-
-  closeDropdown()
+  if (!clickedTrigger && !clickedPanel) {
+    closeDropdown()
+  }
 }
 
 function handleWindowChange() {
-  if (!isOpen.value) return
-  calculatePosition()
+  if (isOpen.value) {
+    calculatePosition()
+  }
 }
 
 onMounted(() => {
@@ -117,53 +117,50 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="inline-flex">
+  <div class="w-full">
     <button
       ref="triggerRef"
       type="button"
-      title="Cambiar estado"
-      class="inline-flex min-w-[124px] items-center justify-between gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:opacity-90"
-      :class="getEstadoClass(value)"
+      :class="triggerClass"
       @click.stop="toggleDropdown"
     >
-      <span class="truncate">{{ getEstadoLabel(value) }}</span>
-      <ChevronDown class="h-3.5 w-3.5 shrink-0" />
+      <span
+        class="inline-flex min-w-[124px] items-center justify-center rounded-full border px-3 py-1.5 text-xs font-semibold"
+        :class="getEstadoClass(modelValue)"
+      >
+        {{ getEstadoLabel(modelValue) }}
+      </span>
+
+      <ChevronDown class="h-4 w-4 text-[var(--text-secondary)]" />
     </button>
 
     <Teleport to="body">
       <div
         v-if="isOpen"
         ref="panelRef"
-        class="fixed z-[99999] w-[260px] rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 shadow-2xl"
+        class="fixed z-[99999] rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 shadow-2xl"
         :style="{
           top: `${position.top}px`,
           left: `${position.left}px`,
+          width: `${triggerRef?.offsetWidth || 240}px`,
         }"
       >
-        <div class="mb-2 px-2 pt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-          Cambiar estado
-        </div>
-
         <button
-          v-for="option in TASK_ESTADOS"
+          v-for="option in options"
           :key="option.value"
           type="button"
-          class="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition hover:bg-[var(--bg-hover)]"
+          class="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-sm transition hover:bg-[var(--bg-hover)]"
           @click="selectEstado(option.value)"
         >
           <span class="text-[var(--text-primary)]">{{ option.label }}</span>
 
           <span
             class="inline-flex min-w-[108px] items-center justify-center rounded-full border px-2.5 py-1 text-[11px] font-semibold"
-            :class="option.className"
+            :class="getEstadoClass(option.value)"
           >
             {{ option.label }}
           </span>
         </button>
-
-        <div v-if="isSaving" class="flex justify-center py-2">
-          <BaseSpinner size="sm" />
-        </div>
       </div>
     </Teleport>
   </div>

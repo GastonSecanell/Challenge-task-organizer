@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
 import CardItem from './CardItem.vue'
-import ConfirmActionModal from './ConfirmActionModal.vue'
+import ConfirmActionModal from './ui/ConfirmActionModal.vue'
 
 const props = defineProps({
   columns: { type: Array, required: true },

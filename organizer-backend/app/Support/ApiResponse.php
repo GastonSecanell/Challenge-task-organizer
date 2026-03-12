@@ -27,7 +27,7 @@ class ApiResponse
         return response()->json(array_merge([
             'message' => $message,
             'errors' => $errors,
-            'codigo' => $status,
+            'status' => $status,
         ], $extra), $status);
     }
 

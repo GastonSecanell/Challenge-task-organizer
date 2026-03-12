@@ -70,6 +70,17 @@ class Tarea extends Model
         return $query->where('prioridad_id', $prioridadId);
     }
 
+    public function scopePorEtiqueta(Builder $query, ?int $etiquetaId): Builder
+    {
+        if (!$etiquetaId) {
+            return $query;
+        }
+
+        return $query->whereHas('etiquetas', function (Builder $q) use ($etiquetaId) {
+            $q->where('etiquetas.id', $etiquetaId);
+        });
+    }
+
     public function scopePorFechaVencimiento(Builder $query, ?string $fechaVencimiento): Builder
     {
         if (!$fechaVencimiento) {

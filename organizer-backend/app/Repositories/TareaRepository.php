@@ -30,6 +30,9 @@ class TareaRepository extends BaseRepository
             ->with(['prioridad', 'etiquetas'])
             ->busqueda($filtros['busqueda'] ?? null)
             ->porEstado($filtros['estado'] ?? null)
+            ->porEtiqueta(isset($filtros['etiqueta_id']) && $filtros['etiqueta_id'] !== ''
+                ? (int) $filtros['etiqueta_id']
+                : null)
             ->porPrioridad(isset($filtros['prioridad_id']) && $filtros['prioridad_id'] !== ''
                 ? (int) $filtros['prioridad_id']
                 : null)

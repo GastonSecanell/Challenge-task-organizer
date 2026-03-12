@@ -14,6 +14,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  etiquetas: {
+    type: Array,
+    default: () => [],
+  },
   loading: {
     type: Boolean,
     default: false,
@@ -62,9 +66,10 @@ const hasActiveFilters = computed(() => {
     Boolean(props.search) ||
     Boolean(props.filters?.estado) ||
     Boolean(props.filters?.prioridad_id) ||
+    Boolean(props.filters?.etiqueta_id) ||
     Boolean(props.filters?.fecha_vencimiento)
-  );
-});
+  )
+})
 
 const effectiveTotal = computed(() =>
   props.total > 0 ? props.total : props.items.length,
@@ -95,6 +100,7 @@ function iconFor(column) {
       :end="end"
       :total="effectiveTotal"
       :prioridades="prioridades"
+      :etiquetas="etiquetas"
       @update:search="$emit('update:search', $event)"
       @update:filters="$emit('update:filters', $event)"
       @update:showFilters="$emit('update:showFilters', $event)"
@@ -102,13 +108,11 @@ function iconFor(column) {
     />
 
     <div class="relative min-h-[260px]">
-      <div class="dark-scroll max-h-[520px] overflow-auto">
-        <table class="w-full min-w-[1040px] border-collapse text-sm">
+      <div class="dark-scroll max-h-[620px] overflow-auto">
+        <table class="w-full min-w-[1280px] border-collapse text-sm">
           <thead class="sticky top-0 z-20 bg-[var(--bg-surface)] text-xs">
             <tr class="border-t border-[var(--border-default)]">
-              <th
-                class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="w-[50%] px-4 py-3 text-left font-medium text-[var(--text-secondary)]">
                 <button
                   type="button"
                   class="inline-flex items-center gap-1 transition hover:text-[var(--accent)]"
@@ -192,6 +196,7 @@ function iconFor(column) {
               :item="item"
               :index="index"
               :prioridades="prioridades"
+              :etiquetas="etiquetas"
               @edit="$emit('edit', $event)"
               @delete="$emit('delete', $event)"
               @change-status="$emit('change-status', $event)"
@@ -207,8 +212,7 @@ function iconFor(column) {
           v-if="loading"
           class="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-[color:rgba(15,23,42,0.35)] backdrop-blur-[2px]"
         >
-          <BaseSpinner size="lg" label="Cargando tareas..." />
-          <p class="text-sm font-medium text-white">Cargando tareas...</p>
+          <BaseSpinner size="lg" label="Cargando tareas..." />       
         </div>
       </transition>
     </div>

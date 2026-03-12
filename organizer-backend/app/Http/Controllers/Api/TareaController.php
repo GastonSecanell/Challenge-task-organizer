@@ -29,6 +29,7 @@ class TareaController extends Controller
             'por_pagina' => $request->get('por_pagina', 10),
             'busqueda' => $request->get('busqueda'),
             'estado' => $request->get('estado'),
+            'etiqueta_id' => $request->get('etiqueta_id'),
             'prioridad_id' => $request->get('prioridad_id'),
             'fecha_vencimiento' => $request->get('fecha_vencimiento'),
             'ordenar_por' => $request->get('ordenar_por', 'id'),

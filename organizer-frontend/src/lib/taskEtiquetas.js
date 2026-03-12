@@ -1,18 +1,18 @@
 export const ETIQUETA_STYLES = {
   DEV: {
-    badge: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
-    chip: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
-    checkbox: 'accent-blue-500',
+    badge: 'border-[var(--task-label-blue-border)] bg-[var(--task-label-blue-bg)] text-[var(--task-label-blue-text)]',
+    chip: 'border-[var(--task-label-blue-border)] bg-[var(--task-label-blue-bg)] text-[var(--task-label-blue-text)]',
+    checkbox: 'accent-[var(--task-label-blue-accent)]',
   },
   QA: {
-    badge: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300',
-    chip: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300',
-    checkbox: 'accent-yellow-500',
+    badge: 'border-[var(--task-label-yellow-border)] bg-[var(--task-label-yellow-bg)] text-[var(--task-label-yellow-text)]',
+    chip: 'border-[var(--task-label-yellow-border)] bg-[var(--task-label-yellow-bg)] text-[var(--task-label-yellow-text)]',
+    checkbox: 'accent-[var(--task-label-yellow-accent)]',
   },
   RRHH: {
-    badge: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
-    chip: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
-    checkbox: 'accent-violet-500',
+    badge: 'border-[var(--task-label-violet-border)] bg-[var(--task-label-violet-bg)] text-[var(--task-label-violet-text)]',
+    chip: 'border-[var(--task-label-violet-border)] bg-[var(--task-label-violet-bg)] text-[var(--task-label-violet-text)]',
+    checkbox: 'accent-[var(--task-label-violet-accent)]',
   },
 }
 

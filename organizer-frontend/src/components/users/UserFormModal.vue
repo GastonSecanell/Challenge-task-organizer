@@ -158,7 +158,7 @@ async function initModal() {
   }
 }
 
-async function submit() {
+async function submitUsuario() {
   if (!validate()) return
 
   isSaving.value = true
@@ -176,11 +176,11 @@ async function submit() {
     }
 
     if (isEdit.value) {
-      await UsersApi.update(props.userId, payload)
-      toasts.success('Usuario actualizado correctamente.')
+      const res = await UsersApi.update(props.userId, payload)
+      toasts.success(res?.message || 'Usuario actualizado correctamente')
     } else {
-      await UsersApi.create(payload)
-      toasts.success('Usuario creado correctamente.')
+      const res = await UsersApi.create(payload)
+      toasts.success(res?.message || 'Usuario creado correctamente')
     }
 
     emit('saved')
@@ -213,7 +213,7 @@ watch(
       <BaseSpinner size="lg" label="Cargando formulario..." />
     </div>
 
-    <form v-else class="space-y-4" @submit.prevent="submit">
+    <form v-else class="space-y-4" @submit.prevent="submitUsuario">
       <div>
         <label class="mb-1 block text-sm text-[var(--text-secondary)]">
           Nombre
@@ -300,7 +300,7 @@ watch(
         Cancelar
       </BaseButton>
 
-      <BaseButton :disabled="isSaving" @click="submit">
+      <BaseButton :disabled="isSaving" @click="submitUsuario">
         <BaseSpinner v-if="isSaving" size="sm" />
         <span>{{ isSaving ? 'Guardando...' : 'Guardar' }}</span>
       </BaseButton>

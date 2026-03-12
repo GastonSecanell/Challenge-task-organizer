@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toasts'
 import { BoardsApi } from '@/lib/api/boards'
 import { getAvatarObjectUrl } from '@/lib/avatars'
-import ConfirmActionModal from './ConfirmActionModal.vue'
+import ConfirmActionModal from './ui/ConfirmActionModal.vue'
 
 const props = defineProps({
   boardId: { type: Number, required: true },

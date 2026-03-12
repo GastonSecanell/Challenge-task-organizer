@@ -1,168 +1,225 @@
 <script setup>
-import { reactive, ref, watch, computed } from 'vue'
-import BaseModal from '@/components/ui/BaseModal.vue'
-import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
-import { useToastStore } from '@/stores/toasts'
-import { TareasApi } from '@/lib/api/tareas'
-import { PrioridadesApi } from '@/lib/api/prioridades'
-import { EtiquetasApi } from '@/lib/api/etiquetas'
-import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
+import { reactive, ref, watch, computed } from "vue";
+import { QuillEditor } from "@vueup/vue-quill";
+
+import BaseModal from "@/components/ui/BaseModal.vue";
+import BaseSpinner from "@/components/ui/BaseSpinner.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+
+import { useToastStore } from "@/stores/toasts";
+import { TareasApi } from "@/lib/api/tareas";
+import { isValidEstado } from "@/lib/taskEstados";
+
+import TaskFormEstadoDropdown from "./TaskFormEstadoDropdown.vue";
+import TaskFormPrioridadDropdown from "./TaskFormPrioridadDropdown.vue";
+import TaskFormEtiquetasDropdown from "./TaskFormEtiquetasDropdown.vue";
 
 const props = defineProps({
   open: Boolean,
   tareaId: [Number, String, null],
-})
+  prioridades: {
+    type: Array,
+    default: () => [],
+  },
+  etiquetas: {
+    type: Array,
+    default: () => [],
+  },
+});
 
-const emit = defineEmits(['close', 'saved'])
+const emit = defineEmits(["close", "saved"]);
+const toasts = useToastStore();
 
-const toasts = useToastStore()
-
-const isLoading = ref(false)
-const isSaving = ref(false)
-
-const prioridades = ref([])
-const etiquetasDisponibles = ref([])
+const isLoading = ref(false);
+const isSaving = ref(false);
 
 const form = reactive({
-  titulo: '',
-  descripcion: '',
-  estado: 'pendiente',
-  fecha_vencimiento: '',
-  prioridad_id: '',
+  titulo: "",
+  descripcion: "<p><br></p>",
+  estado: "pendiente",
+  fecha_vencimiento: "",
+  prioridad_id: "",
   etiquetas: [],
-})
+});
 
 const errors = reactive({
-  titulo: '',
-  descripcion: '',
-  estado: '',
-  fecha_vencimiento: '',
-  prioridad_id: '',
-  etiquetas: '',
-})
+  titulo: "",
+  descripcion: "",
+  estado: "",
+  fecha_vencimiento: "",
+  prioridad_id: "",
+  etiquetas: "",
+});
 
-const isEdit = computed(() => Boolean(props.tareaId))
+const isEdit = computed(() => Boolean(props.tareaId));
+const modalTitle = computed(() =>
+  isEdit.value ? "Editar tarea" : "Nueva tarea",
+);
+
+function fieldClass(hasError = false) {
+  return [
+    "w-full rounded-xl border bg-[var(--bg-surface)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder-[var(--text-muted)]",
+    hasError
+      ? "border-red-500/60 ring-2 ring-red-500/15"
+      : "border-[var(--border-default)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/15",
+  ].join(" ");
+}
 
 function resetErrors() {
-  errors.titulo = ''
-  errors.descripcion = ''
-  errors.estado = ''
-  errors.fecha_vencimiento = ''
-  errors.prioridad_id = ''
-  errors.etiquetas = ''
+  errors.titulo = "";
+  errors.descripcion = "";
+  errors.estado = "";
+  errors.fecha_vencimiento = "";
+  errors.prioridad_id = "";
+  errors.etiquetas = "";
 }
 
 function resetForm() {
-  form.titulo = ''
-  form.descripcion = ''
-  form.estado = 'pendiente'
-  form.fecha_vencimiento = ''
-  form.prioridad_id = ''
-  form.etiquetas = []
-  resetErrors()
+  form.titulo = "";
+  form.descripcion = "<p><br></p>";
+  form.estado = "pendiente";
+  form.fecha_vencimiento = "";
+  form.prioridad_id = "";
+  form.etiquetas = [];
+  resetErrors();
+}
+
+function clearFieldError(field) {
+  if (errors[field]) {
+    errors[field] = "";
+  }
+}
+
+function hasValidPrioridad(prioridadId) {
+  if (!prioridadId) return false;
+
+  return props.prioridades.some(
+    (item) => Number(item.id) === Number(prioridadId),
+  );
+}
+
+function stripHtml(html) {
+  return String(html ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function validate() {
-  resetErrors()
+  resetErrors();
 
-  let valid = true
+  let valid = true;
 
   if (!form.titulo.trim()) {
-    errors.titulo = 'El título es obligatorio.'
-    valid = false
+    errors.titulo = "El título es obligatorio.";
+    valid = false;
+  } else if (form.titulo.trim().length < 3) {
+    errors.titulo = "El título debe tener al menos 3 caracteres.";
+    valid = false;
   }
 
-  if (!form.descripcion.trim()) {
-    errors.descripcion = 'La descripción es obligatoria.'
-    valid = false
+  if (!stripHtml(form.descripcion)) {
+    errors.descripcion = "La descripción es obligatoria.";
+    valid = false;
+  } else if (stripHtml(form.descripcion).length < 5) {
+    errors.descripcion = "La descripción debe tener al menos 5 caracteres.";
+    valid = false;
   }
 
-  if (!form.estado) {
-    errors.estado = 'El estado es obligatorio.'
-    valid = false
+  if (!isValidEstado(form.estado)) {
+    errors.estado = "El estado seleccionado no es válido.";
+    valid = false;
   }
 
-  if (!form.prioridad_id) {
-    errors.prioridad_id = 'La prioridad es obligatoria.'
-    valid = false
+  if (!hasValidPrioridad(form.prioridad_id)) {
+    errors.prioridad_id = "La prioridad seleccionada no es válida.";
+    valid = false;
   }
 
-  return valid
+  return valid;
 }
 
-async function loadCatalogos() {
-  const [resPrioridades, resEtiquetas] = await Promise.all([
-    PrioridadesApi.list(),
-    EtiquetasApi.list(),
-  ])
+function applyBackendErrors(error) {
+  const backendErrors = error?.response?.data?.errors;
+  if (!backendErrors || typeof backendErrors !== "object") return;
 
-  prioridades.value = resPrioridades?.data ?? []
-  etiquetasDisponibles.value = resEtiquetas?.data ?? []
+  Object.keys(errors).forEach((key) => {
+    const value = backendErrors[key];
+    if (Array.isArray(value) && value.length > 0) {
+      errors[key] = String(value[0]);
+    }
+  });
 }
 
 async function loadTarea(id) {
-  const res = await TareasApi.get(id)
-  const tarea = res?.data
+  const res = await TareasApi.get(id);
+  const tarea = res?.data;
 
-  form.titulo = tarea?.titulo ?? ''
-  form.descripcion = tarea?.descripcion ?? ''
-  form.estado = tarea?.estado ?? 'pendiente'
-  form.fecha_vencimiento = tarea?.fecha_vencimiento ?? ''
-  form.prioridad_id = tarea?.prioridad_id ?? ''
+  form.titulo = tarea?.titulo ?? "";
+  form.descripcion = tarea?.descripcion ?? "";
+  form.estado = tarea?.estado ?? "pendiente";
+  form.fecha_vencimiento = tarea?.fecha_vencimiento ?? "";
+  form.prioridad_id = tarea?.prioridad_id ? Number(tarea.prioridad_id) : "";
   form.etiquetas = Array.isArray(tarea?.etiquetas)
-    ? tarea.etiquetas.map(et => et.id)
-    : []
+    ? tarea.etiquetas.map((et) => Number(et.id))
+    : [];
 }
 
 async function initModal() {
-  if (!props.open) return
+  if (!props.open) return;
 
-  isLoading.value = true
+  isLoading.value = true;
 
   try {
-    resetForm()
-    await loadCatalogos()
+    resetForm();
 
     if (props.tareaId) {
-      await loadTarea(props.tareaId)
+      await loadTarea(props.tareaId);
     }
   } catch (error) {
-    toasts.error('No se pudieron cargar los datos del formulario.')
-    emit('close')
+    toasts.error("No se pudieron cargar los datos del formulario.");
+    emit("close");
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
-async function submit() {
-  if (!validate()) return
+async function submitTarea() {
+  if (isSaving.value) return;
+  if (!validate()) return;
 
-  isSaving.value = true
+  isSaving.value = true;
+  resetErrors();
 
   try {
     const payload = {
       titulo: form.titulo.trim(),
-      descripcion: form.descripcion.trim(),
+      descripcion: form.descripcion,
       estado: form.estado,
       fecha_vencimiento: form.fecha_vencimiento || null,
       prioridad_id: Number(form.prioridad_id),
       etiquetas: form.etiquetas.map(Number),
-    }
+    };
 
     if (isEdit.value) {
-      await TareasApi.update(props.tareaId, payload)
-      toasts.success('Tarea actualizada.')
+      const res = await TareasApi.update(props.tareaId, payload);
+      toasts.success(res?.message || "Tarea actualizada");
     } else {
-      await TareasApi.create(payload)
-      toasts.success('Tarea creada.')
+      const res = await TareasApi.create(payload);
+      toasts.success(res?.message || "Tarea creada");
     }
 
-    emit('saved')
+    emit("saved");
   } catch (error) {
-    toasts.error(error?.message || 'Error al guardar la tarea.')
+    applyBackendErrors(error);
+    toasts.error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Error al guardar la tarea.",
+    );
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
 }
 
@@ -170,154 +227,282 @@ watch(
   () => [props.open, props.tareaId],
   () => {
     if (props.open) {
-      initModal()
+      initModal();
     }
   },
-  { immediate: false }
-)
+);
+
+watch(
+  () => form.titulo,
+  () => clearFieldError("titulo"),
+);
+watch(
+  () => form.descripcion,
+  () => clearFieldError("descripcion"),
+);
+watch(
+  () => form.estado,
+  () => clearFieldError("estado"),
+);
+watch(
+  () => form.fecha_vencimiento,
+  () => clearFieldError("fecha_vencimiento"),
+);
+watch(
+  () => form.prioridad_id,
+  () => clearFieldError("prioridad_id"),
+);
+watch(
+  () => form.etiquetas,
+  () => clearFieldError("etiquetas"),
+  { deep: true },
+);
 </script>
 
 <template>
   <BaseModal
     :open="open"
-    :title="isEdit ? 'Editar tarea' : 'Nueva tarea'"
-    width-class="max-w-2xl"
+    :title="modalTitle"
+    width-class="max-w-3xl"
     @close="$emit('close')"
   >
     <div v-if="isLoading" class="flex justify-center py-10">
       <BaseSpinner size="lg" />
     </div>
 
-    <form v-else class="space-y-4" @submit.prevent="submit">
-      <div>
-        <label class="mb-1 block text-sm font-medium text-[var(--text-primary)]">
-          Título
-        </label>
-
-        <input
-          v-model="form.titulo"
-          class="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-        >
-
-        <p v-if="errors.titulo" class="mt-1 text-xs text-red-500">
-          {{ errors.titulo }}
-        </p>
-      </div>
-
-      <div>
-        <label class="mb-1 block text-sm font-medium text-[var(--text-primary)]">
-          Descripción
-        </label>
-
-        <textarea
-          v-model="form.descripcion"
-          rows="4"
-          class="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-        />
-
-        <p v-if="errors.descripcion" class="mt-1 text-xs text-red-500">
-          {{ errors.descripcion }}
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <form v-else class="space-y-5" @submit.prevent="submitTarea">
+      <div class="grid grid-cols-1 gap-5">
         <div>
-          <label class="mb-1 block text-sm font-medium text-[var(--text-primary)]">
+          <label
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+          >
+            Título
+          </label>
+
+          <input
+            v-model="form.titulo"
+            type="text"
+            maxlength="255"
+            placeholder="Ej: Ajustar validación de tareas"
+            :class="fieldClass(!!errors.titulo)"
+          />
+
+          <div class="mt-1 flex items-center justify-between gap-3">
+            <p v-if="errors.titulo" class="text-xs font-medium text-red-500">
+              {{ errors.titulo }}
+            </p>
+            <span v-else class="text-xs text-[var(--text-muted)]">
+              {{ form.titulo.trim().length }}/255
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+          >
+            Descripción
+          </label>
+
+          <div
+            class="rounded-xl border bg-[var(--bg-surface)] transition"
+            :class="
+              errors.descripcion
+                ? 'border-red-500/60 ring-2 ring-red-500/15'
+                : 'border-[var(--border-default)] focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent)]/15'
+            "
+          >
+            <QuillEditor
+              v-model:content="form.descripcion"
+              contentType="html"
+              theme="snow"
+              toolbar="full"
+              class="task-quill-editor"
+              placeholder="Describí brevemente el alcance de la tarea"
+            />
+          </div>
+
+          <p
+            v-if="errors.descripcion"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
+            {{ errors.descripcion }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+          >
             Estado
           </label>
 
-          <select
+          <TaskFormEstadoDropdown
             v-model="form.estado"
-            class="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-          >
-            <option value="pendiente">Pendiente</option>
-            <option value="en_progreso">En progreso</option>
-            <option value="completada">Completada</option>
-          </select>
+            :error="!!errors.estado"
+          />
 
-          <p v-if="errors.estado" class="mt-1 text-xs text-red-500">
+          <p v-if="errors.estado" class="mt-1 text-xs font-medium text-red-500">
             {{ errors.estado }}
           </p>
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-[var(--text-primary)]">
+          <label
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+          >
             Fecha de vencimiento
           </label>
 
           <input
             v-model="form.fecha_vencimiento"
             type="date"
-            class="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-          >
+            :class="fieldClass(!!errors.fecha_vencimiento)"
+          />
 
-          <p v-if="errors.fecha_vencimiento" class="mt-1 text-xs text-red-500">
+          <p
+            v-if="errors.fecha_vencimiento"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
             {{ errors.fecha_vencimiento }}
           </p>
         </div>
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-medium text-[var(--text-primary)]">
-          Prioridad
-        </label>
-
-        <select
-          v-model="form.prioridad_id"
-          class="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-        >
-          <option value="">Seleccionar prioridad</option>
-          <option
-            v-for="prioridad in prioridades"
-            :key="prioridad.id"
-            :value="prioridad.id"
-          >
-            {{ prioridad.prioridad }}
-          </option>
-        </select>
-
-        <p v-if="errors.prioridad_id" class="mt-1 text-xs text-red-500">
-          {{ errors.prioridad_id }}
-        </p>
-      </div>
-
-      <div>
-        <label class="mb-2 block text-sm font-medium text-[var(--text-primary)]">
-          Etiquetas
-        </label>
-
-        <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div>
           <label
-            v-for="etiqueta in etiquetasDisponibles"
-            :key="etiqueta.id"
-            class="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition hover:opacity-90"
-            :class="getEtiquetaStyle(etiqueta.etiqueta).chip"
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
           >
-            <input
-              v-model="form.etiquetas"
-              type="checkbox"
-              :value="etiqueta.id"
-              :class="getEtiquetaStyle(etiqueta.etiqueta).checkbox"
-            >
-            <span>{{ etiqueta.etiqueta }}</span>
+            Prioridad
           </label>
+
+          <TaskFormPrioridadDropdown
+            v-model="form.prioridad_id"
+            :prioridades="prioridades"
+            :error="!!errors.prioridad_id"
+          />
+
+          <p
+            v-if="errors.prioridad_id"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
+            {{ errors.prioridad_id }}
+          </p>
         </div>
 
-        <p v-if="errors.etiquetas" class="mt-1 text-xs text-red-500">
-          {{ errors.etiquetas }}
-        </p>
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-semibold text-[var(--text-primary)]"
+          >
+            Etiquetas
+          </label>
+
+          <TaskFormEtiquetasDropdown
+            v-model="form.etiquetas"
+            :etiquetas="etiquetas"
+            :error="!!errors.etiquetas"
+          />
+
+          <p
+            v-if="errors.etiquetas"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
+            {{ errors.etiquetas }}
+          </p>
+        </div>
       </div>
     </form>
 
     <template #footer>
-      <BaseButton variant="ghost" @click="$emit('close')">
-        Cancelar
-      </BaseButton>
+      <div class="flex w-full items-center justify-end gap-3">
+        <BaseButton
+          variant="ghost"
+          :disabled="isSaving"
+          @click="$emit('close')"
+        >
+          Cancelar
+        </BaseButton>
 
-      <BaseButton :disabled="isSaving" @click="submit">
-        <BaseSpinner v-if="isSaving" size="sm" />
-        {{ isSaving ? 'Guardando...' : 'Guardar' }}
-      </BaseButton>
+        <BaseButton :disabled="isSaving" @click="submitTarea">
+          <BaseSpinner v-if="isSaving" size="sm" />
+          {{
+            isSaving
+              ? "Guardando..."
+              : isEdit
+                ? "Guardar cambios"
+                : "Crear tarea"
+          }}
+        </BaseButton>
+      </div>
     </template>
   </BaseModal>
 </template>
+
+<style scoped>
+:deep(.task-quill-editor .ql-toolbar) {
+  border: 0;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+:deep(.task-quill-editor .ql-container) {
+  border: 0;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-height: 180px;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
+
+:deep(.task-quill-editor .ql-editor) {
+  min-height: 180px;
+  color: var(--text-primary);
+}
+
+:deep(.task-quill-editor .ql-editor.ql-blank::before) {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+:deep(.task-quill-editor .ql-toolbar button:hover),
+:deep(.task-quill-editor .ql-toolbar button:focus) {
+  background: var(--bg-soft);
+  border-radius: 0.375rem;
+}
+
+:deep(.task-quill-editor .ql-stroke) {
+  stroke: var(--text-secondary);
+}
+
+:deep(.task-quill-editor .ql-fill) {
+  fill: var(--text-secondary);
+}
+
+:deep(.task-quill-editor .ql-picker) {
+  color: var(--text-secondary);
+}
+
+:deep(.task-quill-editor .ql-snow .ql-picker-options) {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+:deep(.task-quill-editor .ql-active) {
+  color: var(--accent) !important;
+}
+
+:deep(.task-quill-editor .ql-active .ql-stroke) {
+  stroke: var(--accent) !important;
+}
+
+:deep(.task-quill-editor .ql-active .ql-fill) {
+  fill: var(--accent) !important;
+}
+</style>

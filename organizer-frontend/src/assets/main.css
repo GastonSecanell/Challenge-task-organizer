@@ -31,18 +31,104 @@
 
   /* Status badge */
   --status-online-bg: #0f2a17;
-  --status-online-text: #C3F5CD;
+  --status-online-text: #c3f5cd;
   --status-online-border: #063207;
 
-  --status-offline-bg: #bababa4D;
+  --status-offline-bg: #bababa4d;
   --status-offline-text: #9ca3af;
-  --status-offline-border: #bababa4D;
+  --status-offline-border: #bababa4d;
 
   /* Charts */
   --chart-organic: #7b99ff;
   --chart-social: #c9d7fd;
   --chart-direct: #28e384;
   --chart-track: rgba(255, 255, 255, 0.18);
+
+  /* =====================
+     TASK LABELS / BADGES
+  ===================== */
+  --task-label-blue-bg: rgba(59, 130, 246, 0.1);
+  --task-label-blue-border: rgba(59, 130, 246, 0.3);
+  --task-label-blue-text: #93c5fd;
+  --task-label-blue-accent: #3b82f6;
+
+  --task-label-yellow-bg: rgba(234, 179, 8, 0.1);
+  --task-label-yellow-border: rgba(234, 179, 8, 0.3);
+  --task-label-yellow-text: #fde047;
+  --task-label-yellow-accent: #eab308;
+
+  --task-label-violet-bg: rgba(168, 85, 247, 0.1);
+  --task-label-violet-border: rgba(168, 85, 247, 0.3);
+  --task-label-violet-text: #d8b4fe;
+  --task-label-violet-accent: #a855f7;
+
+  --task-label-emerald-bg: rgba(16, 185, 129, 0.1);
+  --task-label-emerald-border: rgba(16, 185, 129, 0.3);
+  --task-label-emerald-text: #6ee7b7;
+  --task-label-emerald-accent: #10b981;
+
+  --task-label-rose-bg: rgba(244, 63, 94, 0.1);
+  --task-label-rose-border: rgba(244, 63, 94, 0.3);
+  --task-label-rose-text: #fda4af;
+  --task-label-rose-accent: #f43f5e;
+
+  --task-label-slate-bg: rgba(148, 163, 184, 0.1);
+  --task-label-slate-border: rgba(148, 163, 184, 0.28);
+  --task-label-slate-text: #cbd5e1;
+  --task-label-slate-accent: #94a3b8;
+
+  /* =====================
+     TASK STATUS
+  ===================== */
+  --task-status-pending-bg: rgba(148, 163, 184, 0.1);
+  --task-status-pending-border: rgba(148, 163, 184, 0.3);
+  --task-status-pending-text: #cbd5e1;
+
+  --task-status-progress-bg: rgba(245, 158, 11, 0.1);
+  --task-status-progress-border: rgba(245, 158, 11, 0.3);
+  --task-status-progress-text: #fcd34d;
+
+  --task-status-done-bg: rgba(16, 185, 129, 0.1);
+  --task-status-done-border: rgba(16, 185, 129, 0.3);
+  --task-status-done-text: #6ee7b7;
+
+  /* =====================
+     TASK PRIORITY
+  ===================== */
+  --task-priority-low-bg: rgba(56, 189, 248, 0.1);
+  --task-priority-low-border: rgba(56, 189, 248, 0.3);
+  --task-priority-low-text: #7dd3fc;
+
+  --task-priority-medium-bg: rgba(245, 158, 11, 0.1);
+  --task-priority-medium-border: rgba(245, 158, 11, 0.3);
+  --task-priority-medium-text: #fcd34d;
+
+  --task-priority-high-bg: rgba(239, 68, 68, 0.1);
+  --task-priority-high-border: rgba(239, 68, 68, 0.3);
+  --task-priority-high-text: #fca5a5;
+
+  /* =====================
+     TASK DUE DATE
+  ===================== */
+  --task-due-far-text: #86efac;
+  --task-due-far-bg: rgba(16, 185, 129, 0.1);
+  --task-due-far-border: rgba(16, 185, 129, 0.25);
+
+  --task-due-medium-text: #fcd34d;
+  --task-due-medium-bg: rgba(245, 158, 11, 0.1);
+  --task-due-medium-border: rgba(245, 158, 11, 0.25);
+
+  --task-due-near-text: #fdba74;
+  --task-due-near-bg: rgba(249, 115, 22, 0.1);
+  --task-due-near-border: rgba(249, 115, 22, 0.25);
+
+  --task-due-urgent-text: #fca5a5;
+  --task-due-urgent-bg: rgba(239, 68, 68, 0.1);
+  --task-due-urgent-border: rgba(239, 68, 68, 0.25);
+
+  --task-due-overdue-text: #fecaca;
+  --task-due-overdue-bg: rgba(220, 38, 38, 0.14);
+  --task-due-overdue-border: rgba(220, 38, 38, 0.35);
 }
 
 /* =====================
@@ -84,6 +170,92 @@
   --chart-social: #93c5fd;
   --chart-direct: #22c55e;
   --chart-track: rgba(0, 0, 0, 0.12);
+
+  /* =====================
+     TASK LABELS / BADGES
+  ===================== */
+  --task-label-blue-bg: rgba(59, 130, 246, 0.08);
+  --task-label-blue-border: rgba(59, 130, 246, 0.22);
+  --task-label-blue-text: #1d4ed8;
+  --task-label-blue-accent: #2563eb;
+
+  --task-label-yellow-bg: rgba(234, 179, 8, 0.1);
+  --task-label-yellow-border: rgba(234, 179, 8, 0.24);
+  --task-label-yellow-text: #a16207;
+  --task-label-yellow-accent: #ca8a04;
+
+  --task-label-violet-bg: rgba(168, 85, 247, 0.08);
+  --task-label-violet-border: rgba(168, 85, 247, 0.22);
+  --task-label-violet-text: #7e22ce;
+  --task-label-violet-accent: #9333ea;
+
+  --task-label-emerald-bg: rgba(16, 185, 129, 0.08);
+  --task-label-emerald-border: rgba(16, 185, 129, 0.22);
+  --task-label-emerald-text: #047857;
+  --task-label-emerald-accent: #059669;
+
+  --task-label-rose-bg: rgba(244, 63, 94, 0.08);
+  --task-label-rose-border: rgba(244, 63, 94, 0.22);
+  --task-label-rose-text: #be123c;
+  --task-label-rose-accent: #e11d48;
+
+  --task-label-slate-bg: rgba(148, 163, 184, 0.1);
+  --task-label-slate-border: rgba(148, 163, 184, 0.22);
+  --task-label-slate-text: #475569;
+  --task-label-slate-accent: #64748b;
+
+  /* =====================
+     TASK STATUS
+  ===================== */
+  --task-status-pending-bg: rgba(148, 163, 184, 0.1);
+  --task-status-pending-border: rgba(148, 163, 184, 0.22);
+  --task-status-pending-text: #475569;
+
+  --task-status-progress-bg: rgba(245, 158, 11, 0.1);
+  --task-status-progress-border: rgba(245, 158, 11, 0.22);
+  --task-status-progress-text: #b45309;
+
+  --task-status-done-bg: rgba(16, 185, 129, 0.1);
+  --task-status-done-border: rgba(16, 185, 129, 0.22);
+  --task-status-done-text: #047857;
+
+  /* =====================
+     TASK PRIORITY
+  ===================== */
+  --task-priority-low-bg: rgba(56, 189, 248, 0.1);
+  --task-priority-low-border: rgba(56, 189, 248, 0.22);
+  --task-priority-low-text: #0369a1;
+
+  --task-priority-medium-bg: rgba(245, 158, 11, 0.1);
+  --task-priority-medium-border: rgba(245, 158, 11, 0.22);
+  --task-priority-medium-text: #b45309;
+
+  --task-priority-high-bg: rgba(239, 68, 68, 0.1);
+  --task-priority-high-border: rgba(239, 68, 68, 0.22);
+  --task-priority-high-text: #b91c1c;
+
+  /* =====================
+     TASK DUE DATE
+  ===================== */
+  --task-due-far-text: #15803d;
+  --task-due-far-bg: rgba(34, 197, 94, 0.08);
+  --task-due-far-border: rgba(34, 197, 94, 0.2);
+
+  --task-due-medium-text: #a16207;
+  --task-due-medium-bg: rgba(234, 179, 8, 0.1);
+  --task-due-medium-border: rgba(234, 179, 8, 0.2);
+
+  --task-due-near-text: #c2410c;
+  --task-due-near-bg: rgba(249, 115, 22, 0.1);
+  --task-due-near-border: rgba(249, 115, 22, 0.2);
+
+  --task-due-urgent-text: #dc2626;
+  --task-due-urgent-bg: rgba(239, 68, 68, 0.1);
+  --task-due-urgent-border: rgba(239, 68, 68, 0.2);
+
+  --task-due-overdue-text: #991b1b;
+  --task-due-overdue-bg: rgba(220, 38, 38, 0.12);
+  --task-due-overdue-border: rgba(220, 38, 38, 0.24);
 }
 
 /* =====================
@@ -157,11 +329,11 @@ select {
   animation: table-row-enter 0.25s ease-out both;
 }
 
-
-* {
+/* * {
   transition:
     background-color 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     fill 0.25s ease;
-}
+} */
+ 

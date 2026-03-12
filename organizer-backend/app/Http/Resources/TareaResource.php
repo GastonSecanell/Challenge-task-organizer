@@ -19,12 +19,13 @@ class TareaResource extends JsonResource
             'titulo' => $this->titulo,
             'descripcion' => $this->descripcion,
             'estado' => $this->estado,
-            'fecha_vencimiento' => optional($this->fecha_vencimiento)?->format('Y-m-d'),
+            'etiqueta' => $this->etiqueta,
+            'fecha_vencimiento' => optional($this->fecha_vencimiento)?->format('d/m/Y'),
             'prioridad_id' => $this->prioridad_id,
             'prioridad' => new PrioridadResource($this->whenLoaded('prioridad')),
             'etiquetas' => EtiquetaResource::collection($this->whenLoaded('etiquetas')),
-            'created_at' => optional($this->created_at)?->format('Y-m-d H:i:s'),
-            'updated_at' => optional($this->updated_at)?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('d/m/Y H:i'),
+            'updated_at' => $this->updated_at?->format('d/m/Y H:i'),
         ];
     }
 }

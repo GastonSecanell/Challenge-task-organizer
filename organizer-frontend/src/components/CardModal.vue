@@ -10,7 +10,7 @@ import { extractDominantColor } from '@/lib/imageColor'
 
 import BoardLabelsModal from './BoardLabelsModal.vue'
 import ImageViewerModal from './ImageViewerModal.vue'
-import ConfirmActionModal from './ConfirmActionModal.vue'
+import ConfirmActionModal from './ui/ConfirmActionModal.vue'
 
 // APIS
 import { CardsApi } from '@/lib/api/cards'

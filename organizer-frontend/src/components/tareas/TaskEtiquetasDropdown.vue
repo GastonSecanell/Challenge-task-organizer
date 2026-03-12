@@ -3,7 +3,6 @@ import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { Teleport } from "vue";
 import { Plus, X } from "lucide-vue-next";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
-import { EtiquetasApi } from "@/lib/api/etiquetas";
 import { TareasApi } from "@/lib/api/tareas";
 import { getEtiquetaStyle } from "@/lib/taskEtiquetas";
 import { useToastStore } from "@/stores/toasts";
@@ -14,6 +13,10 @@ const props = defineProps({
     required: true,
   },
   selectedEtiquetas: {
+    type: Array,
+    default: () => [],
+  },
+  etiquetasDisponibles: {
     type: Array,
     default: () => [],
   },
@@ -49,7 +52,7 @@ function calculatePosition() {
 
   const rect = triggerRef.value.getBoundingClientRect();
 
-  const panelWidth = 260;
+  const panelWidth = 768;
   const spacing = 8;
 
   let left = rect.left;
@@ -73,20 +76,6 @@ function calculatePosition() {
   position.value = { top, left };
 }
 
-async function ensureEtiquetasLoaded() {
-  if (etiquetasDisponibles.value.length > 0) return;
-
-  isLoading.value = true;
-  try {
-    const res = await EtiquetasApi.list();
-    etiquetasDisponibles.value = res?.data ?? [];
-  } catch (error) {
-    toasts.error(error?.message || "No se pudieron cargar las etiquetas.");
-  } finally {
-    isLoading.value = false;
-  }
-}
-
 async function openDropdown() {
   syncSelectedFromProps();
   isOpen.value = true;
@@ -94,7 +83,10 @@ async function openDropdown() {
   await nextTick();
   calculatePosition();
 
-  await ensureEtiquetasLoaded();
+  if (props.etiquetasDisponibles.length) {
+    etiquetasDisponibles.value = props.etiquetasDisponibles;
+    return;
+  }
 
   await nextTick();
   calculatePosition();
@@ -128,17 +120,17 @@ async function toggleEtiqueta(etiquetaId) {
   isSaving.value = true;
 
   try {
-    await TareasApi.updateEtiquetas(props.tareaId, {
+    const res = await TareasApi.updateEtiquetas(props.tareaId, {
       etiquetas: selectedIds.value,
     });
-
+    toasts.success(res?.message || 'Etiquetas actualizadas');
     emit("updated");
   } catch (error) {
     console.error(error);
     toasts.error(
       error?.response?.data?.message ||
         error?.message ||
-        "No se pudieron actualizar las etiquetas.",
+        "No se pudieron actualizar las etiquetas",
     );
     syncSelectedFromProps();
   } finally {
