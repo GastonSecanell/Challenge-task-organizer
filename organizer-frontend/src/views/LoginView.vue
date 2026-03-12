@@ -31,7 +31,7 @@ async function submit() {
       message: 'Sesión iniciada.',
     })
 
-    const redirectTo = route.query.redirect?.toString() || '/dashboard'
+    const redirectTo = route.query.redirect?.toString() || '/tareas'
     await router.push(redirectTo)
   } catch (e) {
     error.value = e?.message ?? String(e)

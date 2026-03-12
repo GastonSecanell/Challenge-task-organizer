@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-const LS_THEME = 'board.theme'
+const LS_THEME = 'tareas.theme'
 
 function apply(theme) {
   document.documentElement.dataset.theme = theme

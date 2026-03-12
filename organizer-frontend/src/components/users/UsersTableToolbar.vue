@@ -1,6 +1,6 @@
 <script setup>
 import { Search, Trash2, Plus, Minus } from 'lucide-vue-next'
-import BaseSelectRole from '@/components/ui/BaseSelectRole.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 
 const props = defineProps({
   search: {
@@ -115,12 +115,16 @@ function updateFilter(key, value) {
           @input="updateFilter('email', $event.target.value)"
         >
 
-        <BaseSelectRole
-          :model-value="filters.role_id"
-          :roles="roles"
-          class-name="w-[420px]"
-          @update:model-value="updateFilter('role_id', $event)"
-        />
+        <div class="w-[240px] shrink-0">
+          <BaseSelect
+            :model-value="filters.role_id"
+            :options="roles"
+            option-label="name"
+            option-value="id"
+            placeholder="Todos los roles"
+            @update:modelValue="updateFilter('role_id', $event)"
+          />
+        </div>
       </div>
 
       <button

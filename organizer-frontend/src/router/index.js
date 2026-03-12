@@ -3,7 +3,6 @@ import { useAuthStore } from '@/stores/auth'
 
 import AppLayout from '@/layouts/AppLayout.vue'
 import LoginView from '@/views/LoginView.vue'
-import DashboardView from '@/views/DashboardView.vue'
 import TareasView from '@/views/TareasIndexView.vue'
 import UsersIndexView from '@/views/UsersIndexView.vue'
 
@@ -21,12 +20,7 @@ const router = createRouter({
       component: AppLayout,
       meta: { requiresAuth: true },
       children: [
-        { path: '', redirect: '/dashboard' },
-        {
-          path: 'dashboard',
-          name: 'dashboard',
-          component: DashboardView,
-        },
+        { path: '', redirect: '/tareas' },
         {
           path: 'tareas',
           name: 'tareas.index',
@@ -36,6 +30,7 @@ const router = createRouter({
           path: 'usuarios',
           name: 'usuarios.index',
           component: UsersIndexView,
+          meta: { requiresAdmin: true },
         },
       ],
     },
@@ -47,24 +42,29 @@ router.beforeEach(async (to) => {
 
   if (to.meta.public) {
     if (auth.isAuthenticated && to.name === 'login') {
-      return { path: '/dashboard' }
+      return { path: '/tareas' }
     }
     return true
   }
 
-  if (to.meta.requiresAuth) {
-    if (!auth.isAuthenticated) {
-      return { path: '/login', query: { redirect: to.fullPath } }
-    }
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
 
-    if (!auth.user) {
-      try {
-        await auth.fetchMe()
-      } catch {
-        auth.clearSession()
-        return { path: '/login' }
-      }
+  if (requiresAuth && !auth.isAuthenticated) {
+    return { path: '/login', query: { redirect: to.fullPath } }
+  }
+
+  if (requiresAuth && !auth.user) {
+    try {
+      await auth.fetchMe()
+    } catch {
+      auth.clearSession()
+      return { path: '/login' }
     }
+  }
+
+  if (requiresAdmin && !auth.canViewUsers) {
+    return { path: '/tareas' }
   }
 
   return true

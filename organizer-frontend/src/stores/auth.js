@@ -1,27 +1,15 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { http } from '@/lib/http'
+import { AuthApi } from '@/lib/api/auth'
 
-const LS_TOKEN = 'board.token'
-const LS_USER = 'board.user'
+const LS_TOKEN = 'tareas.token'
+const LS_USER = 'tareas.user'
 
 function safeParseJSON(raw, fallback = null) {
   try {
     return raw ? JSON.parse(raw) : fallback
   } catch {
     return fallback
-  }
-}
-
-function normalizeAuthPayload(payload) {
-  // soporta:
-  // 1) { token, user }
-  // 2) { data: { token, user } }
-  // 3) { data: { data: { token, user } } } (por si tenés wrappers)
-  const p = payload?.data?.data ?? payload?.data ?? payload ?? {}
-  return {
-    token: p?.token ?? '',
-    user: p?.user ?? null,
   }
 }
 
@@ -34,18 +22,21 @@ export const useAuthStore = defineStore('auth', () => {
   const role = computed(() => {
     const fromRoleId = Number(user.value?.role_id || 0)
     if (fromRoleId) return fromRoleId
+
     const fromLegacy = Number(user.value?.role || 0)
     if (fromLegacy) return fromLegacy
+
     return Number(user.value?.roles?.[0]?.id || 0)
   })
+
   const isAdmin = computed(() => role.value === 1)
-  const canManageUsers = computed(() => role.value === 1)
-  const canReadAudit = computed(() => role.value === 1 || role.value === 4)
-  const canManageBoards = computed(() => role.value === 1 || role.value === 2)
-  const canManageColumns = computed(() => role.value === 1 || role.value === 2)
-  const canWriteCards = computed(() => role.value === 1 || role.value === 2 || role.value === 3)
-  const canDeleteCards = computed(() => role.value === 1 || role.value === 2)
-  const canManageCards = computed(() => canWriteCards.value) // compat
+  const isConsulta = computed(() => role.value === 4)
+
+  const canViewUsers = computed(() => isAdmin.value)
+  const canManageUsers = computed(() => isAdmin.value)
+
+  const canViewTasks = computed(() => isAdmin.value || isConsulta.value)
+  const canEditTasks = computed(() => isAdmin.value)
 
   function setSession({ token: newToken, user: newUser }) {
     token.value = newToken || ''
@@ -62,36 +53,31 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(LS_USER)
   }
 
-  // LOGIN: no requiere token; usamos http igual (interceptor no agrega Authorization si token vacío)
   async function login({ email, password }) {
-    const res = await http.post('/api/login', {
+    const { token: newToken, user: newUser } = await AuthApi.login({
       email,
       password,
-      device_name: 'web',
     })
 
-    const { token: newToken, user: newUser } = normalizeAuthPayload(res)
     setSession({ token: newToken, user: newUser })
     return newUser
   }
 
-  // ME: requiere token (interceptor lo agrega)
   async function fetchMe() {
     if (!token.value) return null
 
-    const res = await http.get('/api/me')
-    // soporta {user} o {data:{user}}
-    const u = res?.data?.user ?? res?.data?.data?.user ?? res?.data?.data ?? null
-
-    user.value = u
+    const me = await AuthApi.me()
+    user.value = me
     localStorage.setItem(LS_USER, JSON.stringify(user.value))
+
     return user.value
   }
 
   async function logout() {
     if (!token.value) return
+
     try {
-      await http.post('/api/logout')
+      await AuthApi.logout()
     } finally {
       clearSession()
     }
@@ -103,13 +89,11 @@ export const useAuthStore = defineStore('auth', () => {
     role,
     isAuthenticated,
     isAdmin,
+    isConsulta,
+    canViewUsers,
     canManageUsers,
-    canReadAudit,
-    canManageBoards,
-    canManageColumns,
-    canWriteCards,
-    canDeleteCards,
-    canManageCards,
+    canViewTasks,
+    canEditTasks,
     setSession,
     clearSession,
     login,

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { Moon, Sun, ChevronDown, User, LogOut, Shield } from 'lucide-vue-next'
+import { Moon, Sun, ChevronDown, User, LogOut, Shield, Menu, X } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import { useToastStore } from '@/stores/toasts'
@@ -13,14 +13,21 @@ const route = useRoute()
 const router = useRouter()
 
 const profileOpen = ref(false)
+const mobileNavOpen = ref(false)
 const triggerRef = ref(null)
 const panelRef = ref(null)
 
-const navItems = computed(() => [
-  { label: 'Dashboard', to: '/dashboard', name: 'dashboard' },
-  { label: 'Tareas', to: '/tareas', name: 'tareas.index' },
-  { label: 'Usuarios', to: '/usuarios', name: 'usuarios.index' },
-])
+const navItems = computed(() => {
+  const items = [
+    { label: 'Tareas', to: '/tareas', name: 'tareas.index' },
+  ]
+
+  if (auth.canViewUsers) {
+    items.push({ label: 'Usuarios', to: '/usuarios', name: 'usuarios.index' })
+  }
+
+  return items
+})
 
 const currentUser = computed(() => {
   const fromStore = auth.user
@@ -41,7 +48,11 @@ const currentUser = computed(() => {
 
 const userName = computed(() => currentUser.value?.name || 'Usuario')
 const userEmail = computed(() => currentUser.value?.email || '-')
-const userRole = computed(() => currentUser.value?.role?.name || 'Sin rol')
+const userRole = computed(() => {
+  if (auth.isAdmin) return 'Administrador'
+  if (auth.isConsulta) return 'Consulta'
+  return currentUser.value?.role?.name || 'Sin rol'
+})
 
 function isActive(item) {
   return route.name === item.name
@@ -53,6 +64,14 @@ function toggleProfile() {
 
 function closeProfile() {
   profileOpen.value = false
+}
+
+function toggleMobileNav() {
+  mobileNavOpen.value = !mobileNavOpen.value
+}
+
+function closeMobileNav() {
+  mobileNavOpen.value = false
 }
 
 function handleClickOutside(event) {
@@ -69,8 +88,9 @@ function handleClickOutside(event) {
 async function logout() {
   try {
     closeProfile()
-    const res = await auth.logout()
-    toasts.success(res?.message || 'Sesión cerrada correctamente')
+    closeMobileNav()
+    await auth.logout()
+    toasts.success('Sesión cerrada correctamente')
     router.push('/login')
   } catch (error) {
     toasts.error(error?.message || 'No se pudo cerrar la sesión')
@@ -90,19 +110,20 @@ onBeforeUnmount(() => {
   <header
     class="sticky top-0 z-40 border-b border-[var(--border-default)] bg-[var(--bg-surface)]/95 backdrop-blur"
   >
-    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
       <div class="min-w-0">
-        <h1 class="text-lg font-semibold text-[var(--text-primary)]">
+        <h1 class="text-base font-semibold text-[var(--text-primary)] sm:text-lg">
           Gestor de Tareas
         </h1>
-        <p class="text-xs text-[var(--text-muted)]">
+        <p class="hidden text-xs text-[var(--text-muted)] sm:block">
           Challenge Laravel + Vue + Docker
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- nav desktop -->
         <nav
-          class="flex items-center gap-1 rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] p-1"
+          class="hidden items-center gap-1 rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] p-1 md:flex"
         >
           <RouterLink
             v-for="item in navItems"
@@ -119,6 +140,17 @@ onBeforeUnmount(() => {
           </RouterLink>
         </nav>
 
+        <!-- boton nav mobile -->
+        <button
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] text-[var(--text-secondary)] transition hover:border-[var(--accent)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] md:hidden"
+          :title="mobileNavOpen ? 'Cerrar menú' : 'Abrir menú'"
+          @click="toggleMobileNav"
+        >
+          <X v-if="mobileNavOpen" class="h-4 w-4" />
+          <Menu v-else class="h-4 w-4" />
+        </button>
+
         <button
           type="button"
           class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] text-[var(--text-secondary)] transition hover:border-[var(--accent)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
@@ -133,7 +165,7 @@ onBeforeUnmount(() => {
           <button
             ref="triggerRef"
             type="button"
-            class="inline-flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] px-3 py-2 text-left transition hover:border-[var(--accent)] hover:bg-[var(--bg-hover)]"
+            class="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] px-3 py-2 text-left transition hover:border-[var(--accent)] hover:bg-[var(--bg-hover)] sm:gap-3"
             @click="toggleProfile"
           >
             <div
@@ -151,14 +183,14 @@ onBeforeUnmount(() => {
               </p>
             </div>
 
-            <ChevronDown class="h-4 w-4 text-[var(--text-secondary)]" />
+            <ChevronDown class="hidden h-4 w-4 text-[var(--text-secondary)] sm:block" />
           </button>
 
           <transition name="fade">
             <div
               v-if="profileOpen"
               ref="panelRef"
-              class="absolute right-0 top-[calc(100%+10px)] z-50 w-[320px] rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3 shadow-2xl"
+              class="absolute right-0 top-[calc(100%+10px)] z-50 w-[290px] rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3 shadow-2xl sm:w-[320px]"
             >
               <div class="mb-3 border-b border-[var(--border-default)] pb-3">
                 <div class="flex items-start gap-3">
@@ -197,5 +229,30 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
+
+    <!-- nav mobile -->
+    <transition name="fade">
+      <div
+        v-if="mobileNavOpen"
+        class="border-t border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 md:hidden"
+      >
+        <nav class="flex flex-col gap-2">
+          <RouterLink
+            v-for="item in navItems"
+            :key="item.name"
+            :to="item.to"
+            class="rounded-lg px-3 py-2 text-sm transition-colors"
+            :class="
+              isActive(item)
+                ? 'bg-[var(--accent)] text-white'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+            "
+            @click="closeMobileNav"
+          >
+            {{ item.label }}
+          </RouterLink>
+        </nav>
+      </div>
+    </transition>
   </header>
 </template>

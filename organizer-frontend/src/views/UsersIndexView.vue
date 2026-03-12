@@ -1,29 +1,33 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import BaseButton from "@/components/ui/BaseButton.vue";
-import UsersTable from "@/components/users/UsersTable.vue";
-import BasePagination from "@/components/ui/BasePagination.vue";
-import UserFormModal from "@/components/users/UserFormModal.vue";
-import ConfirmActionModal from "@/components/ui/ConfirmActionModal.vue";
-import { useToastStore } from "@/stores/toasts";
-import { UsersApi } from "@/lib/api/users";
-import { RolesApi } from "@/lib/api/roles";
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import UsersTable from '@/components/users/UsersTable.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
+import UserFormModal from '@/components/users/UserFormModal.vue'
+import ConfirmActionModal from '@/components/ui/ConfirmActionModal.vue'
+import { useToastStore } from '@/stores/toasts'
+import { useAuthStore } from '@/stores/auth'
+import { UsersApi } from '@/lib/api/users'
+import { RolesApi } from '@/lib/api/roles'
 
-const toasts = useToastStore();
+const router = useRouter()
+const auth = useAuthStore()
+const toasts = useToastStore()
 
-const items = ref([]);
-const roles = ref([]);
-const loading = ref(true);
+const items = ref([])
+const roles = ref([])
+const loading = ref(true)
 
-const busqueda = ref("");
+const busqueda = ref('')
 
 const filtros = ref({
-  name: "",
-  email: "",
-  role_id: "",
-  ordenar_por: "id",
-  direccion: "desc",
-});
+  name: '',
+  email: '',
+  role_id: '',
+  ordenar_por: 'id',
+  direccion: 'desc',
+})
 
 const paginacion = ref({
   pagina_actual: 1,
@@ -32,28 +36,28 @@ const paginacion = ref({
   ultima_pagina: 1,
   desde: 0,
   hasta: 0,
-});
+})
 
-const showFilters = ref(false);
+const showFilters = ref(false)
 
-const modalOpen = ref(false);
-const selectedId = ref(null);
+const modalOpen = ref(false)
+const selectedId = ref(null)
 
-const confirmDeleteOpen = ref(false);
-const deleting = ref(false);
-const selectedUserToDelete = ref(null);
+const confirmDeleteOpen = ref(false)
+const deleting = ref(false)
+const selectedUserToDelete = ref(null)
 
 async function fetchRoles() {
   try {
-    const res = await RolesApi.list();
-    roles.value = res?.data ?? [];
+    const res = await RolesApi.list()
+    roles.value = res?.data ?? []
   } catch {
-    toasts.error("No se pudieron cargar los roles.");
+    toasts.error('No se pudieron cargar los roles.')
   }
 }
 
 async function fetchUsers() {
-  loading.value = true;
+  loading.value = true
 
   try {
     const params = {
@@ -65,11 +69,11 @@ async function fetchUsers() {
       role_id: filtros.value.role_id || undefined,
       ordenar_por: filtros.value.ordenar_por,
       direccion: filtros.value.direccion,
-    };
+    }
 
-    const res = await UsersApi.list(params);
+    const res = await UsersApi.list(params)
 
-    items.value = res?.data ?? [];
+    items.value = res?.data ?? []
     paginacion.value = {
       pagina_actual: Number(res?.paginacion?.pagina_actual ?? 1),
       por_pagina: Number(res?.paginacion?.por_pagina ?? 10),
@@ -77,91 +81,94 @@ async function fetchUsers() {
       ultima_pagina: Number(res?.paginacion?.ultima_pagina ?? 1),
       desde: Number(res?.paginacion?.desde ?? 0),
       hasta: Number(res?.paginacion?.hasta ?? 0),
-    };
-  } catch (error) {
-    toasts.error("No se pudieron cargar los usuarios.");
+    }
+  } catch {
+    toasts.error('No se pudieron cargar los usuarios.')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function updateSearch(value) {
-  busqueda.value = value;
-  paginacion.value.pagina_actual = 1;
-  fetchUsers();
+  busqueda.value = value
+  paginacion.value.pagina_actual = 1
+  fetchUsers()
 }
 
 function updateFilters(value) {
-  filtros.value = value;
-  paginacion.value.pagina_actual = 1;
-  fetchUsers();
+  filtros.value = value
+  paginacion.value.pagina_actual = 1
+  fetchUsers()
 }
 
 function updateShowFilters(value) {
-  showFilters.value = value;
+  showFilters.value = value
 }
 
 function resetFilters() {
-  busqueda.value = "";
+  busqueda.value = ''
   filtros.value = {
-    name: "",
-    email: "",
-    role_id: "",
-    ordenar_por: "id",
-    direccion: "desc",
-  };
-  paginacion.value.pagina_actual = 1;
-  fetchUsers();
+    name: '',
+    email: '',
+    role_id: '',
+    ordenar_por: 'id',
+    direccion: 'desc',
+  }
+  paginacion.value.pagina_actual = 1
+  fetchUsers()
 }
 
 function updateSort(column) {
   if (filtros.value.ordenar_por === column) {
     filtros.value.direccion =
-      filtros.value.direccion === "asc" ? "desc" : "asc";
+      filtros.value.direccion === 'asc' ? 'desc' : 'asc'
   } else {
-    filtros.value.ordenar_por = column;
-    filtros.value.direccion = "asc";
+    filtros.value.ordenar_por = column
+    filtros.value.direccion = 'asc'
   }
 
-  paginacion.value.pagina_actual = 1;
-  fetchUsers();
+  paginacion.value.pagina_actual = 1
+  fetchUsers()
 }
 
 async function updatePage(value) {
-  if (value < 1 || value > paginacion.value.ultima_pagina) return;
-  paginacion.value.pagina_actual = value;
-  await fetchUsers();
+  if (value < 1 || value > paginacion.value.ultima_pagina) return
+  paginacion.value.pagina_actual = value
+  await fetchUsers()
 }
 
 async function updatePerPage(value) {
-  paginacion.value.por_pagina = value;
-  paginacion.value.pagina_actual = 1;
-  await fetchUsers();
+  paginacion.value.por_pagina = value
+  paginacion.value.pagina_actual = 1
+  await fetchUsers()
 }
 
 function openCreate() {
-  selectedId.value = null;
-  modalOpen.value = true;
+  if (!auth.canManageUsers) return
+  selectedId.value = null
+  modalOpen.value = true
 }
 
 function openEdit(user) {
-  selectedId.value = user.id;
-  modalOpen.value = true;
+  if (!auth.canManageUsers) return
+  selectedId.value = user.id
+  modalOpen.value = true
 }
 
 function closeModal() {
-  modalOpen.value = false;
-  selectedId.value = null;
+  modalOpen.value = false
+  selectedId.value = null
 }
 
 async function handleSaved() {
-  closeModal();
-  await fetchUsers();
+  closeModal()
+  await fetchUsers()
 }
 
 function handleDelete(user) {
-  selectedUserToDelete.value = user;
-  confirmDeleteOpen.value = true;
+  if (!auth.canManageUsers) return
+  selectedUserToDelete.value = user
+  confirmDeleteOpen.value = true
 }
 
 function closeDeleteModal() {
@@ -171,6 +178,7 @@ function closeDeleteModal() {
 }
 
 async function confirmDelete() {
+  if (!auth.canManageUsers) return
   if (!selectedUserToDelete.value?.id) return
 
   deleting.value = true
@@ -184,22 +192,29 @@ async function confirmDelete() {
     toasts.success(res?.message || 'Usuario eliminado correctamente')
     await fetchUsers()
   } catch {
-    toasts.error("No se pudo eliminar el usuario.")
+    toasts.error('No se pudo eliminar el usuario.')
   } finally {
     deleting.value = false
   }
 }
 
 onMounted(async () => {
-  await fetchRoles();
-  await fetchUsers();
-});
+  if (!auth.canViewUsers) {
+    router.replace('/tareas')
+    return
+  }
+
+  await fetchRoles()
+  await fetchUsers()
+})
 </script>
 
 <template>
   <section class="space-y-4">
     <div class="flex items-center justify-end">
-      <BaseButton @click="openCreate">Nuevo usuario</BaseButton>
+      <BaseButton v-if="auth.canManageUsers" @click="openCreate">
+        Nuevo usuario
+      </BaseButton>
     </div>
 
     <UsersTable
@@ -212,6 +227,7 @@ onMounted(async () => {
       :search="busqueda"
       :filters="filtros"
       :show-filters="showFilters"
+      :can-manage-users="auth.canManageUsers"
       @update:search="updateSearch"
       @update:filters="updateFilters"
       @update:showFilters="updateShowFilters"
@@ -230,6 +246,7 @@ onMounted(async () => {
     />
 
     <UserFormModal
+      v-if="auth.canManageUsers"
       :open="modalOpen"
       :user-id="selectedId"
       @close="closeModal"

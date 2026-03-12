@@ -300,20 +300,6 @@ body {
   background-color: var(--scroll-thumb);
 }
 
-select option {
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-}
-
-select option:checked {
-  background-color: var(--accent);
-  color: #fff;
-}
-
-select {
-  color-scheme: dark;
-}
-
 @keyframes table-row-enter {
   from {
     opacity: 0;
@@ -336,4 +322,71 @@ select {
     border-color 0.25s ease,
     fill 0.25s ease;
 } */
- 
+
+select option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+select option:checked {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+select {
+  color-scheme: dark;
+}
+
+.base-select {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.base-select__control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 0 2.2rem 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  outline: none;
+  box-shadow: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.base-select__control:hover {
+  border-color: var(--accent);
+}
+
+.base-select__control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.base-select__control:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.base-select__icon {
+  pointer-events: none;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  color: var(--accent);
+  stroke-width: 1.8;
+}

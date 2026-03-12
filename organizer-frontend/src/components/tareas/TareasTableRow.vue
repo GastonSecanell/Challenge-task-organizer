@@ -23,6 +23,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  canEdit: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -40,6 +44,8 @@ function rowClass(index) {
 }
 
 function handleChangeStatus(estado) {
+  if (!props.canEdit) return
+
   emit('change-status', {
     id: props.item.id,
     estado,
@@ -47,12 +53,42 @@ function handleChangeStatus(estado) {
 }
 
 function handleChangePriority(prioridadId) {
+  if (!props.canEdit) return
+
   emit('change-priority', {
     id: props.item.id,
     prioridad_id: prioridadId,
   })
 }
 
+function prioridadLabel(prioridad) {
+  if (!prioridad) return 'Sin prioridad'
+  if (typeof prioridad === 'string') return prioridad
+  return prioridad.prioridad || 'Sin prioridad'
+}
+
+function estadoLabel(estado) {
+  if (estado === 'pendiente') return 'Pendiente'
+  if (estado === 'en_progreso') return 'En progreso'
+  if (estado === 'completada') return 'Completada'
+  return estado || '-'
+}
+
+function estadoBadgeClass(estado) {
+  if (estado === 'pendiente') {
+    return 'border-[var(--task-status-pending-border)] bg-[var(--task-status-pending-bg)] text-[var(--task-status-pending-text)]'
+  }
+
+  if (estado === 'en_progreso') {
+    return 'border-[var(--task-status-progress-border)] bg-[var(--task-status-progress-bg)] text-[var(--task-status-progress-text)]'
+  }
+
+  if (estado === 'completada') {
+    return 'border-[var(--task-status-done-border)] bg-[var(--task-status-done-bg)] text-[var(--task-status-done-text)]'
+  }
+
+  return 'border-[var(--border-default)] bg-[var(--bg-hover)] text-[var(--text-secondary)]'
+}
 </script>
 
 <template>
@@ -65,17 +101,25 @@ function handleChangePriority(prioridadId) {
         {{ item.titulo }}
       </div>
       <div
-        class="mt-1 text-xs text-[var(--text-secondary)] line-clamp-1 prose prose-sm max-w-none"
+        class="prose prose-sm mt-1 line-clamp-1 max-w-none text-xs text-[var(--text-secondary)]"
         v-html="item.descripcion || 'Sin descripción'"
       ></div>
     </td>
 
     <td class="px-4 py-3 align-middle">
       <TaskPrioridadDropdown
+        v-if="canEdit"
         :value="item.prioridad"
         :prioridades="prioridades"
         @change="handleChangePriority"
       />
+
+      <span
+        v-else
+        class="inline-flex rounded-full border px-2.5 py-1 text-xs font-medium text-[var(--text-primary)] border-[var(--border-default)] bg-[var(--bg-hover)]"
+      >
+        {{ prioridadLabel(item.prioridad) }}
+      </span>
     </td>
 
     <td class="px-4 py-3">
@@ -99,6 +143,7 @@ function handleChangePriority(prioridadId) {
         </div>
 
         <TaskEtiquetasDropdown
+          v-if="canEdit"
           :tarea-id="item.id"
           :selected-etiquetas="item.etiquetas"
           :etiquetas-disponibles="etiquetas"
@@ -109,9 +154,18 @@ function handleChangePriority(prioridadId) {
 
     <td class="px-4 py-3 align-middle">
       <TaskEstadoDropdown
+        v-if="canEdit"
         :value="item.estado"
         @change="handleChangeStatus"
       />
+
+      <span
+        v-else
+        class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+        :class="estadoBadgeClass(item.estado)"
+      >
+        {{ estadoLabel(item.estado) }}
+      </span>
     </td>
 
     <td class="px-4 py-3">
@@ -124,7 +178,7 @@ function handleChangePriority(prioridadId) {
     </td>
 
     <td class="px-2 py-3 text-center">
-      <div class="flex justify-center gap-2">
+      <div v-if="canEdit" class="flex justify-center gap-2">
         <button
           class="text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
           title="Editar tarea"
@@ -141,6 +195,10 @@ function handleChangePriority(prioridadId) {
           <Trash2 class="h-4 w-4" />
         </button>
       </div>
+
+      <span v-else class="text-xs text-[var(--text-muted)]">
+        Solo lectura
+      </span>
     </td>
   </tr>
 </template>

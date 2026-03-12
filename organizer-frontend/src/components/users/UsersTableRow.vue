@@ -1,6 +1,7 @@
 <script setup>
-import { Pencil, Trash2 } from "lucide-vue-next";
-defineProps({
+import { Pencil, Trash2 } from 'lucide-vue-next'
+
+const props = defineProps({
   user: {
     type: Object,
     required: true,
@@ -9,14 +10,18 @@ defineProps({
     type: Number,
     default: 0,
   },
-});
+  canManageUsers: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-defineEmits(["edit", "delete"]);
+defineEmits(['edit', 'delete'])
 
 function rowClass(index) {
   return index % 2 === 0
-    ? "bg-[var(--bg-row-odd)] hover:bg-[var(--bg-hover)]"
-    : "bg-[var(--bg-row-even)] hover:bg-[var(--bg-hover)]";
+    ? 'bg-[var(--bg-row-odd)] hover:bg-[var(--bg-hover)]'
+    : 'bg-[var(--bg-row-even)] hover:bg-[var(--bg-hover)]'
 }
 </script>
 
@@ -44,26 +49,32 @@ function rowClass(index) {
       <span
         class="inline-flex items-center rounded-full border border-[var(--border-default)] px-2.5 py-1 text-xs text-[var(--text-primary)]"
       >
-        {{ user.role?.name || "-" }}
+        {{ user.role?.name || '-' }}
       </span>
     </td>
 
     <td class="px-2 py-3 text-center">
-      <div class="flex justify-center gap-2">
+      <div v-if="canManageUsers" class="flex justify-center gap-2">
         <button
-          class="text-[var(--text-secondary)] hover:text-[var(--accent)] transition"
+          class="text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
+          title="Editar usuario"
           @click="$emit('edit', user)"
         >
-          <Pencil class="w-4 h-4" />
+          <Pencil class="h-4 w-4" />
         </button>
 
         <button
-          class="text-[var(--text-secondary)] hover:text-red-500 transition"
+          class="text-[var(--text-secondary)] transition hover:text-red-500"
+          title="Eliminar usuario"
           @click="$emit('delete', user)"
         >
-          <Trash2 class="w-4 h-4" />
+          <Trash2 class="h-4 w-4" />
         </button>
       </div>
+
+      <span v-else class="text-xs text-[var(--text-muted)]">
+        Solo lectura
+      </span>
     </td>
   </tr>
 </template>

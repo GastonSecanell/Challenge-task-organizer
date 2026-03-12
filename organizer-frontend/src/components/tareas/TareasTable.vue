@@ -1,9 +1,9 @@
 <script setup>
-import { computed } from "vue";
-import { Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-vue-next";
-import BaseSpinner from "@/components/ui/BaseSpinner.vue";
-import TareasTableToolbar from "./TareasTableToolbar.vue";
-import TareasTableRow from "./TareasTableRow.vue";
+import { computed } from 'vue'
+import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
+import BaseSpinner from '@/components/ui/BaseSpinner.vue'
+import TareasTableToolbar from './TareasTableToolbar.vue'
+import TareasTableRow from './TareasTableRow.vue'
 
 const props = defineProps({
   items: {
@@ -36,7 +36,7 @@ const props = defineProps({
   },
   search: {
     type: String,
-    default: "",
+    default: '',
   },
   filters: {
     type: Object,
@@ -46,7 +46,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-});
+  canEdit: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const emit = defineEmits([
   'update:search',
@@ -73,17 +77,19 @@ const hasActiveFilters = computed(() => {
 
 const effectiveTotal = computed(() =>
   props.total > 0 ? props.total : props.items.length,
-);
+)
+
 const start = computed(() =>
   props.items.length === 0 ? 0 : (props.page - 1) * props.perPage + 1,
-);
+)
+
 const end = computed(() =>
   Math.min(start.value + props.items.length - 1, effectiveTotal.value),
-);
+)
 
 function iconFor(column) {
-  if (props.filters?.ordenar_por !== column) return ArrowUpDown;
-  return props.filters?.direccion === "asc" ? ArrowUp : ArrowDown;
+  if (props.filters?.ordenar_por !== column) return ArrowUpDown
+  return props.filters?.direccion === 'asc' ? ArrowUp : ArrowDown
 }
 </script>
 
@@ -123,21 +129,15 @@ function iconFor(column) {
                 </button>
               </th>
 
-              <th
-                class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">
                 Prioridad
               </th>
 
-              <th
-                class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">
                 Etiquetas
               </th>
 
-              <th
-                class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">
                 <button
                   type="button"
                   class="inline-flex items-center gap-1 transition hover:text-[var(--accent)]"
@@ -148,9 +148,7 @@ function iconFor(column) {
                 </button>
               </th>
 
-              <th
-                class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">
                 <button
                   type="button"
                   class="inline-flex items-center gap-1 transition hover:text-[var(--accent)]"
@@ -164,9 +162,7 @@ function iconFor(column) {
                 </button>
               </th>
 
-              <th
-                class="px-4 py-3 text-center font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-4 py-3 text-center font-medium text-[var(--text-secondary)]">
                 Opciones
               </th>
             </tr>
@@ -197,6 +193,7 @@ function iconFor(column) {
               :index="index"
               :prioridades="prioridades"
               :etiquetas="etiquetas"
+              :can-edit="canEdit"
               @edit="$emit('edit', $event)"
               @delete="$emit('delete', $event)"
               @change-status="$emit('change-status', $event)"
@@ -212,7 +209,7 @@ function iconFor(column) {
           v-if="loading"
           class="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-[color:rgba(15,23,42,0.35)] backdrop-blur-[2px]"
         >
-          <BaseSpinner size="lg" label="Cargando tareas..." />       
+          <BaseSpinner size="lg" label="Cargando tareas..." />
         </div>
       </transition>
     </div>

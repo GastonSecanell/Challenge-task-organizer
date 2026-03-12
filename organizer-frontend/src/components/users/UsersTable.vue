@@ -1,9 +1,9 @@
 <script setup>
-import { computed } from "vue";
-import { Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-vue-next";
-import BaseSpinner from "@/components/ui/BaseSpinner.vue";
-import UsersTableToolbar from "./UsersTableToolbar.vue";
-import UsersTableRow from "./UsersTableRow.vue";
+import { computed } from 'vue'
+import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
+import BaseSpinner from '@/components/ui/BaseSpinner.vue'
+import UsersTableToolbar from './UsersTableToolbar.vue'
+import UsersTableRow from './UsersTableRow.vue'
 
 const props = defineProps({
   users: {
@@ -28,7 +28,7 @@ const props = defineProps({
   },
   search: {
     type: String,
-    default: "",
+    default: '',
   },
   filters: {
     type: Object,
@@ -42,17 +42,21 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-});
+  canManageUsers: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const emit = defineEmits([
-  "update:search",
-  "update:filters",
-  "update:showFilters",
-  "resetFilters",
-  "edit",
-  "delete",
-  "sort",
-]);
+  'update:search',
+  'update:filters',
+  'update:showFilters',
+  'resetFilters',
+  'edit',
+  'delete',
+  'sort',
+])
 
 const hasActiveFilters = computed(() => {
   return (
@@ -60,22 +64,24 @@ const hasActiveFilters = computed(() => {
     Boolean(props.filters?.name) ||
     Boolean(props.filters?.email) ||
     Boolean(props.filters?.role_id)
-  );
-});
+  )
+})
 
 const effectiveTotal = computed(() =>
   props.total > 0 ? props.total : props.users.length,
-);
+)
+
 const start = computed(() =>
   props.users.length === 0 ? 0 : (props.page - 1) * props.perPage + 1,
-);
+)
+
 const end = computed(() =>
   Math.min(start.value + props.users.length - 1, effectiveTotal.value),
-);
+)
 
 function iconFor(column) {
-  if (props.filters?.ordenar_por !== column) return ArrowUpDown;
-  return props.filters?.direccion === "asc" ? ArrowUp : ArrowDown;
+  if (props.filters?.ordenar_por !== column) return ArrowUpDown
+  return props.filters?.direccion === 'asc' ? ArrowUp : ArrowDown
 }
 </script>
 
@@ -169,6 +175,7 @@ function iconFor(column) {
               :key="user.id"
               :user="user"
               :index="index"
+              :can-manage-users="canManageUsers"
               @edit="$emit('edit', $event)"
               @delete="$emit('delete', $event)"
             />

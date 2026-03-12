@@ -1,33 +1,35 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import BaseButton from "@/components/ui/BaseButton.vue";
-import TareasTable from "@/components/tareas/TareasTable.vue";
-import BasePagination from "@/components/ui/BasePagination.vue";
-import TareaFormModal from "@/components/tareas/TareaFormModal.vue";
-import ConfirmActionModal from "@/components/ui/ConfirmActionModal.vue";
-import { useToastStore } from "@/stores/toasts";
-import { TareasApi } from "@/lib/api/tareas";
-import { PrioridadesApi } from "@/lib/api/prioridades";
-import { EtiquetasApi } from "@/lib/api/etiquetas";
+import { onMounted, ref } from 'vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import TareasTable from '@/components/tareas/TareasTable.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
+import TareaFormModal from '@/components/tareas/TareaFormModal.vue'
+import ConfirmActionModal from '@/components/ui/ConfirmActionModal.vue'
+import { useToastStore } from '@/stores/toasts'
+import { useAuthStore } from '@/stores/auth'
+import { TareasApi } from '@/lib/api/tareas'
+import { PrioridadesApi } from '@/lib/api/prioridades'
+import { EtiquetasApi } from '@/lib/api/etiquetas'
 
-const toasts = useToastStore();
+const auth = useAuthStore()
+const toasts = useToastStore()
 
-const items = ref([]);
-const prioridades = ref([]);
-const etiquetas = ref([]);
+const items = ref([])
+const prioridades = ref([])
+const etiquetas = ref([])
 
-const loading = ref(true);
+const loading = ref(true)
 
-const busqueda = ref("");
+const busqueda = ref('')
 
 const filtros = ref({
-  estado: "",
-  prioridad_id: "",
-  etiqueta_id: "",
-  fecha_vencimiento: "",
-  ordenar_por: "id",
-  direccion: "desc",
-});
+  estado: '',
+  prioridad_id: '',
+  etiqueta_id: '',
+  fecha_vencimiento: '',
+  ordenar_por: 'id',
+  direccion: 'desc',
+})
 
 const paginacion = ref({
   pagina_actual: 1,
@@ -36,34 +38,34 @@ const paginacion = ref({
   ultima_pagina: 1,
   desde: 0,
   hasta: 0,
-});
+})
 
-const showFilters = ref(false);
+const showFilters = ref(false)
 
-const modalOpen = ref(false);
-const selectedId = ref(null);
+const modalOpen = ref(false)
+const selectedId = ref(null)
 
-const confirmDeleteOpen = ref(false);
-const deleting = ref(false);
-const selectedItemToDelete = ref(null);
+const confirmDeleteOpen = ref(false)
+const deleting = ref(false)
+const selectedItemToDelete = ref(null)
 
 async function initCatalogos() {
   try {
     const [resPrioridades, resEtiquetas] = await Promise.all([
       PrioridadesApi.list(),
       EtiquetasApi.list(),
-    ]);
+    ])
 
-    prioridades.value = resPrioridades?.data ?? [];
-    etiquetas.value = resEtiquetas?.data ?? [];
+    prioridades.value = resPrioridades?.data ?? []
+    etiquetas.value = resEtiquetas?.data ?? []
   } catch {
-    prioridades.value = [];
-    etiquetas.value = [];
+    prioridades.value = []
+    etiquetas.value = []
   }
 }
 
 async function fetchTareas() {
-  loading.value = true;
+  loading.value = true
 
   try {
     const params = {
@@ -76,11 +78,11 @@ async function fetchTareas() {
       fecha_vencimiento: filtros.value.fecha_vencimiento || undefined,
       ordenar_por: filtros.value.ordenar_por,
       direccion: filtros.value.direccion,
-    };
+    }
 
-    const res = await TareasApi.list(params);
+    const res = await TareasApi.list(params)
 
-    items.value = res?.data ?? [];
+    items.value = res?.data ?? []
 
     paginacion.value = {
       pagina_actual: Number(res?.paginacion?.pagina_actual ?? 1),
@@ -89,152 +91,162 @@ async function fetchTareas() {
       ultima_pagina: Number(res?.paginacion?.ultima_pagina ?? 1),
       desde: Number(res?.paginacion?.desde ?? 0),
       hasta: Number(res?.paginacion?.hasta ?? 0),
-    };
+    }
   } catch (error) {
-    toasts.error(error?.message || "No se pudieron cargar las tareas.");
+    toasts.error(error?.message || 'No se pudieron cargar las tareas.')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function updateSearch(value) {
-  busqueda.value = value;
-  paginacion.value.pagina_actual = 1;
-  fetchTareas();
+  busqueda.value = value
+  paginacion.value.pagina_actual = 1
+  fetchTareas()
 }
 
 function updateFilters(value) {
-  filtros.value = value;
-  paginacion.value.pagina_actual = 1;
-  fetchTareas();
+  filtros.value = value
+  paginacion.value.pagina_actual = 1
+  fetchTareas()
 }
 
 function updateShowFilters(value) {
-  showFilters.value = value;
+  showFilters.value = value
 }
 
 function resetFilters() {
-  busqueda.value = "";
+  busqueda.value = ''
   filtros.value = {
-    estado: "",
-    prioridad_id: "",
-    etiqueta_id: "",
-    fecha_vencimiento: "",
-    ordenar_por: "id",
-    direccion: "desc",
-  };
-  paginacion.value.pagina_actual = 1;
-  fetchTareas();
+    estado: '',
+    prioridad_id: '',
+    etiqueta_id: '',
+    fecha_vencimiento: '',
+    ordenar_por: 'id',
+    direccion: 'desc',
+  }
+  paginacion.value.pagina_actual = 1
+  fetchTareas()
 }
 
 function updateSort(column) {
   if (filtros.value.ordenar_por === column) {
     filtros.value.direccion =
-      filtros.value.direccion === "asc" ? "desc" : "asc";
+      filtros.value.direccion === 'asc' ? 'desc' : 'asc'
   } else {
-    filtros.value.ordenar_por = column;
-    filtros.value.direccion = "asc";
+    filtros.value.ordenar_por = column
+    filtros.value.direccion = 'asc'
   }
 
-  paginacion.value.pagina_actual = 1;
-  fetchTareas();
+  paginacion.value.pagina_actual = 1
+  fetchTareas()
 }
 
 async function updatePage(value) {
-  if (value < 1 || value > paginacion.value.ultima_pagina) return;
-  paginacion.value.pagina_actual = value;
-  await fetchTareas();
+  if (value < 1 || value > paginacion.value.ultima_pagina) return
+  paginacion.value.pagina_actual = value
+  await fetchTareas()
 }
 
 async function updatePerPage(value) {
-  paginacion.value.por_pagina = value;
-  paginacion.value.pagina_actual = 1;
-  await fetchTareas();
+  paginacion.value.por_pagina = value
+  paginacion.value.pagina_actual = 1
+  await fetchTareas()
 }
 
 function openCreate() {
-  selectedId.value = null;
-  modalOpen.value = true;
+  if (!auth.canEditTasks) return
+  selectedId.value = null
+  modalOpen.value = true
 }
 
 function openEdit(id) {
-  selectedId.value = id;
-  modalOpen.value = true;
+  if (!auth.canEditTasks) return
+  selectedId.value = id
+  modalOpen.value = true
 }
 
 function closeModal() {
-  modalOpen.value = false;
-  selectedId.value = null;
+  modalOpen.value = false
+  selectedId.value = null
 }
 
 async function handleSaved() {
-  closeModal();
-  await fetchTareas();
+  closeModal()
+  await fetchTareas()
 }
 
 function handleDelete(item) {
-  selectedItemToDelete.value = item;
-  confirmDeleteOpen.value = true;
+  if (!auth.canEditTasks) return
+  selectedItemToDelete.value = item
+  confirmDeleteOpen.value = true
 }
 
 function closeDeleteModal() {
-  if (deleting.value) return;
-  confirmDeleteOpen.value = false;
-  selectedItemToDelete.value = null;
+  if (deleting.value) return
+  confirmDeleteOpen.value = false
+  selectedItemToDelete.value = null
 }
 
 async function confirmDelete() {
-  if (!selectedItemToDelete.value?.id) return;
+  if (!auth.canEditTasks) return
+  if (!selectedItemToDelete.value?.id) return
 
-  deleting.value = true;
+  deleting.value = true
 
   try {
-    const res = await TareasApi.remove(selectedItemToDelete.value.id);
+    const res = await TareasApi.remove(selectedItemToDelete.value.id)
 
-    confirmDeleteOpen.value = false;
-    selectedItemToDelete.value = null;
+    confirmDeleteOpen.value = false
+    selectedItemToDelete.value = null
 
-    toasts.success(res?.message || "Tarea eliminada correctamente");
+    toasts.success(res?.message || 'Tarea eliminada correctamente')
 
-    closeDeleteModal();
-    await fetchTareas();
+    closeDeleteModal()
+    await fetchTareas()
   } catch (error) {
-    toasts.error(error?.message || "No se pudo eliminar la tarea");
+    toasts.error(error?.message || 'No se pudo eliminar la tarea')
   } finally {
-    deleting.value = false;
+    deleting.value = false
   }
 }
 
 async function handleChangePriority({ id, prioridad_id }) {
+  if (!auth.canEditTasks) return
+
   try {
-    const res = await TareasApi.changePriority(id, { prioridad_id });
-    toasts.success(res?.message || "Prioridad actualizada");
-    await fetchTareas();
+    const res = await TareasApi.changePriority(id, { prioridad_id })
+    toasts.success(res?.message || 'Prioridad actualizada')
+    await fetchTareas()
   } catch (error) {
-    toasts.error(error?.message || "No se pudo actualizar la prioridad");
+    toasts.error(error?.message || 'No se pudo actualizar la prioridad')
   }
 }
 
 async function handleChangeStatus({ id, estado }) {
+  if (!auth.canEditTasks) return
+
   try {
-    const res = await TareasApi.changeStatus(id, { estado });
-    toasts.success(res?.message || "Estado actualizado");
-    await fetchTareas();
+    const res = await TareasApi.changeStatus(id, { estado })
+    toasts.success(res?.message || 'Estado actualizado')
+    await fetchTareas()
   } catch (error) {
-    toasts.error(error?.message || "No se pudo actualizar el estado");
+    toasts.error(error?.message || 'No se pudo actualizar el estado')
   }
 }
 
 onMounted(async () => {
-  await initCatalogos();
-  await fetchTareas();
-});
+  await initCatalogos()
+  await fetchTareas()
+})
 </script>
 
 <template>
   <section class="space-y-4">
     <div class="flex items-center justify-end">
-      <BaseButton @click="openCreate"> Nueva tarea </BaseButton>
+      <BaseButton v-if="auth.canEditTasks" @click="openCreate">
+        Nueva tarea
+      </BaseButton>
     </div>
 
     <TareasTable
@@ -248,6 +260,7 @@ onMounted(async () => {
       :search="busqueda"
       :filters="filtros"
       :show-filters="showFilters"
+      :can-edit="auth.canEditTasks"
       @update:search="updateSearch"
       @update:filters="updateFilters"
       @update:showFilters="updateShowFilters"
@@ -269,6 +282,7 @@ onMounted(async () => {
     />
 
     <TareaFormModal
+      v-if="auth.canEditTasks"
       :open="modalOpen"
       :tarea-id="selectedId"
       :prioridades="prioridades"
