@@ -22,6 +22,8 @@ class TareaFactory extends Factory
             'Revisar integración con frontend',
             'Preparar entorno de pruebas',
             'Actualizar documentación técnica',
+            'Ajustar estilos de componentes',
+            'Revisar consumo de API',
         ];
 
         $descripciones = [
@@ -29,13 +31,14 @@ class TareaFactory extends Factory
             '<p>Corregir comportamiento de formularios y validar mensajes de error.</p>',
             '<p>Analizar rendimiento del módulo y reducir consultas innecesarias.</p>',
             '<p>Implementar una mejora visual y funcional en la interfaz.</p>',
+            '<p>Realizar ajustes menores sobre la lógica de negocio y la experiencia de usuario.</p>',
         ];
 
         return [
             'titulo' => fake()->randomElement($titulos),
             'descripcion' => fake()->randomElement($descripciones),
             'estado' => fake()->randomElement($estados),
-            'fecha_vencimiento' => fake()->optional()->dateTimeBetween('now', '+10 days'),
+            'fecha_vencimiento' => fake()->optional()->dateTimeBetween('-2 days', '+10 days'),
             'prioridad_id' => fake()->numberBetween(1, 3),
         ];
     }
