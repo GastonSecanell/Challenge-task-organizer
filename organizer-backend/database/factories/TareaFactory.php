@@ -13,12 +13,30 @@ class TareaFactory extends Factory
     {
         $estados = ['pendiente', 'en_progreso', 'completada'];
 
+        $titulos = [
+            'Configurar autenticación de usuarios',
+            'Corregir errores de validación',
+            'Optimizar consulta de listado',
+            'Implementar filtros por estado',
+            'Diseñar formulario de edición',
+            'Revisar integración con frontend',
+            'Preparar entorno de pruebas',
+            'Actualizar documentación técnica',
+        ];
+
+        $descripciones = [
+            '<p>Revisar la implementación actual y aplicar mejoras de estabilidad.</p>',
+            '<p>Corregir comportamiento de formularios y validar mensajes de error.</p>',
+            '<p>Analizar rendimiento del módulo y reducir consultas innecesarias.</p>',
+            '<p>Implementar una mejora visual y funcional en la interfaz.</p>',
+        ];
+
         return [
-            'titulo' => $this->faker->sentence(4),
-            'descripcion' => $this->faker->paragraph(),
-            'estado' => $this->faker->randomElement($estados),
-            'fecha_vencimiento' => $this->faker->optional()->dateTimeBetween('now', '+10 days'),
-            'prioridad_id' => $this->faker->numberBetween(1, 3),
+            'titulo' => fake()->randomElement($titulos),
+            'descripcion' => fake()->randomElement($descripciones),
+            'estado' => fake()->randomElement($estados),
+            'fecha_vencimiento' => fake()->optional()->dateTimeBetween('now', '+10 days'),
+            'prioridad_id' => fake()->numberBetween(1, 3),
         ];
     }
 }
