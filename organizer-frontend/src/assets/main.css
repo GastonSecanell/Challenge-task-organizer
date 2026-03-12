@@ -390,3 +390,213 @@ select {
   color: var(--accent);
   stroke-width: 1.8;
 }
+
+
+/* =====================
+   TASK DESCRIPTION VIEW
+===================== */
+.task-description-view {
+  min-height: 180px;
+  line-height: 1.6;
+}
+
+.task-description-view p {
+  margin: 0 0 0.75rem 0;
+}
+
+.task-description-view ul {
+  margin: 0.5rem 0 0.75rem 1.25rem;
+  padding-left: 1rem;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.task-description-view ol {
+  margin: 0.5rem 0 0.75rem 1.25rem;
+  padding-left: 1rem;
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+
+.task-description-view li {
+  display: list-item;
+  margin: 0.25rem 0;
+}
+
+.task-description-view ul ul {
+  list-style-type: circle;
+}
+
+.task-description-view ul ul ul {
+  list-style-type: square;
+}
+
+.task-description-view ol ol {
+  list-style-type: lower-alpha;
+}
+
+.task-description-view ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.task-description-view h1,
+.task-description-view h2,
+.task-description-view h3,
+.task-description-view h4 {
+  margin: 1rem 0 0.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.task-description-view strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.task-description-view em {
+  font-style: italic;
+}
+
+.task-description-view a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.task-description-view blockquote {
+  margin: 0.75rem 0;
+  border-left: 3px solid var(--border-default);
+  padding-left: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.task-description-view code {
+  border-radius: 0.375rem;
+  background: var(--bg-hover);
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85em;
+}
+
+.task-description-view pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  background: var(--bg-hover);
+  padding: 0.9rem 1rem;
+  color: var(--text-primary);
+}
+
+.task-description-view img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+.task-description-view .ql-align-center {
+  text-align: center;
+}
+
+.task-description-view .ql-align-right {
+  text-align: right;
+}
+
+.task-description-view .ql-align-justify {
+  text-align: justify;
+}
+
+.task-description-view .ql-indent-1 {
+  margin-left: 1.5rem;
+}
+
+.task-description-view .ql-indent-2 {
+  margin-left: 3rem;
+}
+
+.task-description-view .ql-indent-3 {
+  margin-left: 4.5rem;
+}
+
+.task-description-view .ql-indent-4 {
+  margin-left: 6rem;
+}
+
+.task-description-view .ql-indent-5 {
+  margin-left: 7.5rem;
+}
+
+.task-description-view .ql-indent-6 {
+  margin-left: 9rem;
+}
+
+.task-description-view .ql-indent-7 {
+  margin-left: 10.5rem;
+}
+
+.task-description-view .ql-indent-8 {
+  margin-left: 12rem;
+}
+
+
+/* =====================
+   TASK QUILL EDITOR
+===================== */
+.task-quill-editor .ql-toolbar {
+  border: 0;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.task-quill-editor .ql-container {
+  border: 0;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-height: 180px;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
+
+.task-quill-editor .ql-editor {
+  min-height: 180px;
+  color: var(--text-primary);
+}
+
+.task-quill-editor .ql-editor.ql-blank::before {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.task-quill-editor .ql-toolbar button:hover,
+.task-quill-editor .ql-toolbar button:focus {
+  background: var(--bg-hover);
+  border-radius: 0.375rem;
+}
+
+.task-quill-editor .ql-stroke {
+  stroke: var(--text-secondary);
+}
+
+.task-quill-editor .ql-fill {
+  fill: var(--text-secondary);
+}
+
+.task-quill-editor .ql-picker {
+  color: var(--text-secondary);
+}
+
+.task-quill-editor .ql-snow .ql-picker-options {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.task-quill-editor .ql-active {
+  color: var(--accent) !important;
+}
+
+.task-quill-editor .ql-active .ql-stroke {
+  stroke: var(--accent) !important;
+}
+
+.task-quill-editor .ql-active .ql-fill {
+  fill: var(--accent) !important;
+}

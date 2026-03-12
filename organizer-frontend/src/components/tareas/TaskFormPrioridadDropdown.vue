@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import { getPrioridadClass, getPrioridadLabel } from '@/lib/taskPrioridades'
 
@@ -16,6 +16,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -25,15 +29,17 @@ const panelRef = ref(null)
 const isOpen = ref(false)
 
 const selectedPrioridad = computed(() =>
-  props.prioridades.find((item) => Number(item.id) === Number(props.modelValue)) ?? null
+  props.prioridades.find((item) => Number(item.id) === Number(props.modelValue)) ?? null,
 )
 
 const triggerClass = computed(() => {
   return [
     'inline-flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm transition',
-    props.error
-      ? 'border-red-500/60 ring-2 ring-red-500/15'
-      : 'border-[var(--border-default)] hover:border-[var(--accent)]',
+    props.disabled
+      ? 'cursor-not-allowed border-[var(--border-default)] opacity-70'
+      : props.error
+        ? 'border-red-500/60 ring-2 ring-red-500/15'
+        : 'border-[var(--border-default)] hover:border-[var(--accent)]',
   ].join(' ')
 })
 
@@ -64,6 +70,7 @@ function calculatePosition() {
 }
 
 async function openDropdown() {
+  if (props.disabled) return
   isOpen.value = true
   await nextTick()
   calculatePosition()
@@ -74,6 +81,8 @@ function closeDropdown() {
 }
 
 async function toggleDropdown() {
+  if (props.disabled) return
+
   if (isOpen.value) {
     closeDropdown()
     return
@@ -83,6 +92,7 @@ async function toggleDropdown() {
 }
 
 function selectPrioridad(prioridad) {
+  if (props.disabled) return
   emit('update:modelValue', Number(prioridad.id))
   closeDropdown()
 }
@@ -104,6 +114,15 @@ function handleWindowChange() {
   }
 }
 
+watch(
+  () => props.disabled,
+  (value) => {
+    if (value && isOpen.value) {
+      closeDropdown()
+    }
+  },
+)
+
 onMounted(() => {
   document.addEventListener('mousedown', handleClickOutside)
   window.addEventListener('resize', handleWindowChange)
@@ -122,6 +141,7 @@ onBeforeUnmount(() => {
     <button
       ref="triggerRef"
       type="button"
+      :disabled="disabled"
       :class="triggerClass"
       @click.stop="toggleDropdown"
     >
@@ -145,7 +165,7 @@ onBeforeUnmount(() => {
 
     <Teleport to="body">
       <div
-        v-if="isOpen"
+        v-if="isOpen && !disabled"
         ref="panelRef"
         class="fixed z-[99999] rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 shadow-2xl"
         :style="{

@@ -23,14 +23,20 @@ export const useAuthStore = defineStore('auth', () => {
     const fromRoleId = Number(user.value?.role_id || 0)
     if (fromRoleId) return fromRoleId
 
+    const fromRoleObject = Number(user.value?.role?.id || 0)
+    if (fromRoleObject) return fromRoleObject
+
     const fromLegacy = Number(user.value?.role || 0)
     if (fromLegacy) return fromLegacy
 
-    return Number(user.value?.roles?.[0]?.id || 0)
+    const fromRolesArray = Number(user.value?.roles?.[0]?.id || 0)
+    if (fromRolesArray) return fromRolesArray
+
+    return 0
   })
 
   const isAdmin = computed(() => role.value === 1)
-  const isConsulta = computed(() => role.value === 4)
+  const isConsulta = computed(() => role.value === 3)
 
   const canViewUsers = computed(() => isAdmin.value)
   const canManageUsers = computed(() => isAdmin.value)

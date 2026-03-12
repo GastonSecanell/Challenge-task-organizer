@@ -2,11 +2,11 @@ import './assets/main.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import router from './router'
 
 import { initHttp } from '@/lib/http'
@@ -19,8 +19,9 @@ const pinia = createPinia()
 app.use(pinia)
 
 initHttp({
-    getToken: () => useAuthStore(pinia).token,
+  getToken: () => useAuthStore(pinia).token,
 })
+
 useThemeStore(pinia)
 
 app.use(router)

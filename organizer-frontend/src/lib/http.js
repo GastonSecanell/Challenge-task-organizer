@@ -27,7 +27,7 @@ function getFriendlyErrorMessage(status, body, err) {
     return validationMsg || body?.message || 'Hay errores de validación.'
   }
 
-  if (status === 401) {
+  if (status === 401 || status === 419) {
     return 'Tu sesión venció o no es válida. Iniciá sesión nuevamente.'
   }
 
@@ -88,6 +88,10 @@ http.interceptors.response.use(
   (err) => {
     const status = err?.response?.status
     const body = err?.response?.data ?? null
+
+    if (status === 401 || status === 419) {
+      window.dispatchEvent(new CustomEvent('auth:expired'))
+    }
 
     const msg = getFriendlyErrorMessage(status, body, err)
 

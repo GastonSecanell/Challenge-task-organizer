@@ -1,5 +1,5 @@
 <script setup>
-import { Pencil, Trash2 } from 'lucide-vue-next'
+import { Eye, Pencil, Trash2 } from 'lucide-vue-next'
 import { getEtiquetaStyle } from '@/lib/taskEtiquetas'
 import TaskEtiquetasDropdown from './TaskEtiquetasDropdown.vue'
 import TaskEstadoDropdown from './TaskEstadoDropdown.vue'
@@ -30,6 +30,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'view',
   'edit',
   'delete',
   'change-status',
@@ -116,7 +117,7 @@ function estadoBadgeClass(estado) {
 
       <span
         v-else
-        class="inline-flex rounded-full border px-2.5 py-1 text-xs font-medium text-[var(--text-primary)] border-[var(--border-default)] bg-[var(--bg-hover)]"
+        class="inline-flex rounded-full border border-[var(--border-default)] bg-[var(--bg-hover)] px-2.5 py-1 text-xs font-medium text-[var(--text-primary)]"
       >
         {{ prioridadLabel(item.prioridad) }}
       </span>
@@ -177,28 +178,34 @@ function estadoBadgeClass(estado) {
       </span>
     </td>
 
-    <td class="px-2 py-3 text-center">
-      <div v-if="canEdit" class="flex justify-center gap-2">
+    <td class="px-8 py-3 text-center">
+      <div class="flex justify-center gap-2">
         <button
           class="text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
-          title="Editar tarea"
-          @click="$emit('edit', item.id)"
+          title="Ver tarea"
+          @click="$emit('view', item.id)"
         >
-          <Pencil class="h-4 w-4" />
+          <Eye class="h-4 w-4" />
         </button>
 
-        <button
-          class="text-[var(--text-secondary)] transition hover:text-red-500"
-          title="Eliminar tarea"
-          @click="$emit('delete', item)"
-        >
-          <Trash2 class="h-4 w-4" />
-        </button>
+        <template v-if="canEdit">
+          <button
+            class="text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
+            title="Editar tarea"
+            @click="$emit('edit', item.id)"
+          >
+            <Pencil class="h-4 w-4" />
+          </button>
+
+          <button
+            class="text-[var(--text-secondary)] transition hover:text-red-500"
+            title="Eliminar tarea"
+            @click="$emit('delete', item)"
+          >
+            <Trash2 class="h-4 w-4" />
+          </button>
+        </template>
       </div>
-
-      <span v-else class="text-xs text-[var(--text-muted)]">
-        Solo lectura
-      </span>
     </td>
   </tr>
 </template>

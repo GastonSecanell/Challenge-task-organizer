@@ -44,6 +44,7 @@ const showFilters = ref(false)
 
 const modalOpen = ref(false)
 const selectedId = ref(null)
+const viewMode = ref(false)
 
 const confirmDeleteOpen = ref(false)
 const deleting = ref(false)
@@ -157,18 +158,27 @@ async function updatePerPage(value) {
 function openCreate() {
   if (!auth.canEditTasks) return
   selectedId.value = null
+  viewMode.value = false
+  modalOpen.value = true
+}
+
+function openView(id) {
+  selectedId.value = id
+  viewMode.value = true
   modalOpen.value = true
 }
 
 function openEdit(id) {
   if (!auth.canEditTasks) return
   selectedId.value = id
+  viewMode.value = false
   modalOpen.value = true
 }
 
 function closeModal() {
   modalOpen.value = false
   selectedId.value = null
+  viewMode.value = false
 }
 
 async function handleSaved() {
@@ -201,8 +211,6 @@ async function confirmDelete() {
     selectedItemToDelete.value = null
 
     toasts.success(res?.message || 'Tarea eliminada correctamente')
-
-    closeDeleteModal()
     await fetchTareas()
   } catch (error) {
     toasts.error(error?.message || 'No se pudo eliminar la tarea')
@@ -266,6 +274,7 @@ onMounted(async () => {
       @update:showFilters="updateShowFilters"
       @resetFilters="resetFilters"
       @sort="updateSort"
+      @view="openView"
       @edit="openEdit"
       @delete="handleDelete"
       @change-priority="handleChangePriority"
@@ -282,9 +291,9 @@ onMounted(async () => {
     />
 
     <TareaFormModal
-      v-if="auth.canEditTasks"
       :open="modalOpen"
       :tarea-id="selectedId"
+      :view-mode="viewMode"
       :prioridades="prioridades"
       :etiquetas="etiquetas"
       @close="closeModal"

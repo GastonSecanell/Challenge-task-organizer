@@ -34,7 +34,36 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      redirect: () => {
+        const auth = useAuthStore()
+        return auth.isAuthenticated ? '/tareas' : '/login'
+      },
+    },
   ],
+})
+
+let redirecting = false
+
+window.addEventListener('auth:expired', async () => {
+  if (redirecting) return
+  redirecting = true
+
+  try {
+    const auth = useAuthStore()
+    auth.clearSession()
+
+    if (router.currentRoute.value.path !== '/login') {
+      await router.push({
+        path: '/login',
+        query: { redirect: router.currentRoute.value.fullPath },
+      })
+    }
+  } finally {
+    redirecting = false
+  }
 })
 
 router.beforeEach(async (to) => {
@@ -50,14 +79,15 @@ router.beforeEach(async (to) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
 
-  if (requiresAuth && !auth.isAuthenticated) {
+  if (requiresAuth && !auth.token) {
+    auth.clearSession()
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 
   if (requiresAuth && !auth.user) {
     try {
       await auth.fetchMe()
-    } catch {
+    } catch (error) {
       auth.clearSession()
       return { path: '/login' }
     }

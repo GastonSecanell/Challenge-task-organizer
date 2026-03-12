@@ -58,6 +58,7 @@ const emit = defineEmits([
   'update:showFilters',
   'resetFilters',
   'sort',
+  'view',
   'edit',
   'delete',
   'change-status',
@@ -162,7 +163,7 @@ function iconFor(column) {
                 </button>
               </th>
 
-              <th class="px-4 py-3 text-center font-medium text-[var(--text-secondary)]">
+              <th class="px-8 py-3 font-medium text-[var(--text-secondary)]">
                 Opciones
               </th>
             </tr>
@@ -194,6 +195,7 @@ function iconFor(column) {
               :prioridades="prioridades"
               :etiquetas="etiquetas"
               :can-edit="canEdit"
+              @view="$emit('view', $event)"
               @edit="$emit('edit', $event)"
               @delete="$emit('delete', $event)"
               @change-status="$emit('change-status', $event)"

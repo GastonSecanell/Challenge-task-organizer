@@ -12,6 +12,7 @@ export const useThemeStore = defineStore('theme', () => {
   apply(theme.value)
 
   const isDark = computed(() => theme.value === 'dark')
+  const isLight = computed(() => theme.value === 'light')
 
   function set(next) {
     theme.value = next
@@ -23,6 +24,5 @@ export const useThemeStore = defineStore('theme', () => {
     set(isDark.value ? 'light' : 'dark')
   }
 
-  return { theme, isDark, set, toggle }
+  return { theme, isDark, isLight, set, toggle }
 })
-

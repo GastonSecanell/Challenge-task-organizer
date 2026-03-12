@@ -17,6 +17,10 @@ import TaskFormEtiquetasDropdown from "./TaskFormEtiquetasDropdown.vue";
 const props = defineProps({
   open: Boolean,
   tareaId: [Number, String, null],
+  viewMode: {
+    type: Boolean,
+    default: false,
+  },
   prioridades: {
     type: Array,
     default: () => [],
@@ -51,14 +55,24 @@ const errors = reactive({
   etiquetas: "",
 });
 
-const isEdit = computed(() => Boolean(props.tareaId));
-const modalTitle = computed(() =>
-  isEdit.value ? "Editar tarea" : "Nueva tarea",
-);
+const isEdit = computed(() => Boolean(props.tareaId) && !props.viewMode);
+const isReadOnly = computed(() => props.viewMode === true);
+
+const modalTitle = computed(() => {
+  if (isReadOnly.value) return "Ver tarea";
+  return isEdit.value ? "Editar tarea" : "Nueva tarea";
+});
+
+const safeDescripcionHtml = computed(() => {
+  return (
+    form.descripcion ||
+    "<p class='text-[var(--text-muted)]'>Sin descripción</p>"
+  );
+});
 
 function fieldClass(hasError = false) {
   return [
-    "w-full rounded-xl border bg-[var(--bg-surface)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder-[var(--text-muted)]",
+    "w-full rounded-xl border bg-[var(--bg-surface)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder-[var(--text-muted)] disabled:cursor-not-allowed disabled:opacity-80",
     hasError
       ? "border-red-500/60 ring-2 ring-red-500/15"
       : "border-[var(--border-default)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/15",
@@ -96,6 +110,36 @@ function hasValidPrioridad(prioridadId) {
   return props.prioridades.some(
     (item) => Number(item.id) === Number(prioridadId),
   );
+}
+
+function formatDateForInput(value) {
+  if (!value) return "";
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [dd, mm, yyyy] = value.split("/");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  return "";
+}
+
+function formatDateForView(value) {
+  if (!value) return "Sin fecha";
+
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [yyyy, mm, dd] = value.split("-");
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  return value;
 }
 
 function stripHtml(html) {
@@ -159,7 +203,7 @@ async function loadTarea(id) {
   form.titulo = tarea?.titulo ?? "";
   form.descripcion = tarea?.descripcion ?? "";
   form.estado = tarea?.estado ?? "pendiente";
-  form.fecha_vencimiento = tarea?.fecha_vencimiento ?? "";
+  form.fecha_vencimiento = formatDateForInput(tarea?.fecha_vencimiento ?? "");
   form.prioridad_id = tarea?.prioridad_id ? Number(tarea.prioridad_id) : "";
   form.etiquetas = Array.isArray(tarea?.etiquetas)
     ? tarea.etiquetas.map((et) => Number(et.id))
@@ -177,7 +221,7 @@ async function initModal() {
     if (props.tareaId) {
       await loadTarea(props.tareaId);
     }
-  } catch (error) {
+  } catch {
     toasts.error("No se pudieron cargar los datos del formulario.");
     emit("close");
   } finally {
@@ -186,6 +230,7 @@ async function initModal() {
 }
 
 async function submitTarea() {
+  if (isReadOnly.value) return;
   if (isSaving.value) return;
   if (!validate()) return;
 
@@ -224,7 +269,7 @@ async function submitTarea() {
 }
 
 watch(
-  () => [props.open, props.tareaId],
+  () => [props.open, props.tareaId, props.viewMode],
   () => {
     if (props.open) {
       initModal();
@@ -284,11 +329,15 @@ watch(
             type="text"
             maxlength="255"
             placeholder="Ej: Ajustar validación de tareas"
+            :disabled="isReadOnly"
             :class="fieldClass(!!errors.titulo)"
           />
 
           <div class="mt-1 flex items-center justify-between gap-3">
-            <p v-if="errors.titulo" class="text-xs font-medium text-red-500">
+            <p
+              v-if="errors.titulo && !isReadOnly"
+              class="text-xs font-medium text-red-500"
+            >
               {{ errors.titulo }}
             </p>
             <span v-else class="text-xs text-[var(--text-muted)]">
@@ -304,26 +353,35 @@ watch(
             Descripción
           </label>
 
-          <div
-            class="rounded-xl border bg-[var(--bg-surface)] transition"
-            :class="
-              errors.descripcion
-                ? 'border-red-500/60 ring-2 ring-red-500/15'
-                : 'border-[var(--border-default)] focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent)]/15'
-            "
-          >
-            <QuillEditor
-              v-model:content="form.descripcion"
-              contentType="html"
-              theme="snow"
-              toolbar="full"
-              class="task-quill-editor"
-              placeholder="Describí brevemente el alcance de la tarea"
-            />
-          </div>
+          <template v-if="isReadOnly">
+            <div
+              class="task-description-view rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-primary)]"
+              v-html="safeDescripcionHtml"
+            ></div>
+          </template>
+
+          <template v-else>
+            <div
+              class="rounded-xl border bg-[var(--bg-surface)] transition"
+              :class="
+                errors.descripcion
+                  ? 'border-red-500/60 ring-2 ring-red-500/15'
+                  : 'border-[var(--border-default)] focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent)]/15'
+              "
+            >
+              <QuillEditor
+                v-model:content="form.descripcion"
+                contentType="html"
+                theme="snow"
+                toolbar="full"
+                class="task-quill-editor"
+                placeholder="Describí brevemente el alcance de la tarea"
+              />
+            </div>
+          </template>
 
           <p
-            v-if="errors.descripcion"
+            v-if="errors.descripcion && !isReadOnly"
             class="mt-1 text-xs font-medium text-red-500"
           >
             {{ errors.descripcion }}
@@ -342,9 +400,13 @@ watch(
           <TaskFormEstadoDropdown
             v-model="form.estado"
             :error="!!errors.estado"
+            :disabled="isReadOnly"
           />
 
-          <p v-if="errors.estado" class="mt-1 text-xs font-medium text-red-500">
+          <p
+            v-if="errors.estado && !isReadOnly"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
             {{ errors.estado }}
           </p>
         </div>
@@ -356,14 +418,24 @@ watch(
             Fecha de vencimiento
           </label>
 
-          <input
-            v-model="form.fecha_vencimiento"
-            type="date"
-            :class="fieldClass(!!errors.fecha_vencimiento)"
-          />
+          <template v-if="isReadOnly">
+            <div
+              class="inline-flex min-h-[46px] w-full items-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2.5 text-sm text-[var(--text-primary)]"
+            >
+              {{ formatDateForView(form.fecha_vencimiento) }}
+            </div>
+          </template>
+
+          <template v-else>
+            <input
+              v-model="form.fecha_vencimiento"
+              type="date"
+              :class="fieldClass(!!errors.fecha_vencimiento)"
+            />
+          </template>
 
           <p
-            v-if="errors.fecha_vencimiento"
+            v-if="errors.fecha_vencimiento && !isReadOnly"
             class="mt-1 text-xs font-medium text-red-500"
           >
             {{ errors.fecha_vencimiento }}
@@ -383,10 +455,11 @@ watch(
             v-model="form.prioridad_id"
             :prioridades="prioridades"
             :error="!!errors.prioridad_id"
+            :disabled="isReadOnly"
           />
 
           <p
-            v-if="errors.prioridad_id"
+            v-if="errors.prioridad_id && !isReadOnly"
             class="mt-1 text-xs font-medium text-red-500"
           >
             {{ errors.prioridad_id }}
@@ -404,10 +477,11 @@ watch(
             v-model="form.etiquetas"
             :etiquetas="etiquetas"
             :error="!!errors.etiquetas"
+            :disabled="isReadOnly"
           />
 
           <p
-            v-if="errors.etiquetas"
+            v-if="errors.etiquetas && !isReadOnly"
             class="mt-1 text-xs font-medium text-red-500"
           >
             {{ errors.etiquetas }}
@@ -423,10 +497,14 @@ watch(
           :disabled="isSaving"
           @click="$emit('close')"
         >
-          Cancelar
+          {{ isReadOnly ? "Cerrar" : "Cancelar" }}
         </BaseButton>
 
-        <BaseButton :disabled="isSaving" @click="submitTarea">
+        <BaseButton
+          v-if="!isReadOnly"
+          :disabled="isSaving"
+          @click="submitTarea"
+        >
           <BaseSpinner v-if="isSaving" size="sm" />
           {{
             isSaving
@@ -440,69 +518,3 @@ watch(
     </template>
   </BaseModal>
 </template>
-
-<style scoped>
-:deep(.task-quill-editor .ql-toolbar) {
-  border: 0;
-  border-bottom: 1px solid var(--border-default);
-  background: var(--bg-surface);
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
-}
-
-:deep(.task-quill-editor .ql-container) {
-  border: 0;
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  min-height: 180px;
-  border-bottom-left-radius: 0.75rem;
-  border-bottom-right-radius: 0.75rem;
-}
-
-:deep(.task-quill-editor .ql-editor) {
-  min-height: 180px;
-  color: var(--text-primary);
-}
-
-:deep(.task-quill-editor .ql-editor.ql-blank::before) {
-  color: var(--text-muted);
-  font-style: normal;
-}
-
-:deep(.task-quill-editor .ql-toolbar button:hover),
-:deep(.task-quill-editor .ql-toolbar button:focus) {
-  background: var(--bg-soft);
-  border-radius: 0.375rem;
-}
-
-:deep(.task-quill-editor .ql-stroke) {
-  stroke: var(--text-secondary);
-}
-
-:deep(.task-quill-editor .ql-fill) {
-  fill: var(--text-secondary);
-}
-
-:deep(.task-quill-editor .ql-picker) {
-  color: var(--text-secondary);
-}
-
-:deep(.task-quill-editor .ql-snow .ql-picker-options) {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
-}
-
-:deep(.task-quill-editor .ql-active) {
-  color: var(--accent) !important;
-}
-
-:deep(.task-quill-editor .ql-active .ql-stroke) {
-  stroke: var(--accent) !important;
-}
-
-:deep(.task-quill-editor .ql-active .ql-fill) {
-  fill: var(--accent) !important;
-}
-</style>

@@ -1,7 +1,16 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { Moon, Sun, ChevronDown, User, LogOut, Shield, Menu, X } from 'lucide-vue-next'
+import {
+  Moon,
+  Sun,
+  ChevronDown,
+  User,
+  LogOut,
+  Shield,
+  Menu,
+  X,
+} from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import { useToastStore } from '@/stores/toasts'
@@ -18,9 +27,7 @@ const triggerRef = ref(null)
 const panelRef = ref(null)
 
 const navItems = computed(() => {
-  const items = [
-    { label: 'Tareas', to: '/tareas', name: 'tareas.index' },
-  ]
+  const items = [{ label: 'Tareas', to: '/tareas', name: 'tareas.index' }]
 
   if (auth.canViewUsers) {
     items.push({ label: 'Usuarios', to: '/usuarios', name: 'usuarios.index' })
@@ -53,6 +60,21 @@ const userRole = computed(() => {
   if (auth.isConsulta) return 'Consulta'
   return currentUser.value?.role?.name || 'Sin rol'
 })
+
+const navWrapperClass = computed(() => {
+  return mobileNavOpen.value
+    ? 'flex flex-col gap-2 border-t border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 md:hidden'
+    : 'hidden md:flex md:items-center md:gap-1 md:rounded-xl md:border md:border-[var(--border-default)] md:bg-[var(--bg-page)] md:p-1'
+})
+
+const navLinkBaseClass =
+  'rounded-lg px-3 py-2 text-sm transition-colors'
+
+function navLinkClass(item) {
+  return isActive(item)
+    ? 'bg-[var(--accent)] text-white'
+    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+}
 
 function isActive(item) {
   return route.name === item.name
@@ -121,26 +143,6 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- nav desktop -->
-        <nav
-          class="hidden items-center gap-1 rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] p-1 md:flex"
-        >
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.name"
-            :to="item.to"
-            class="rounded-lg px-3 py-2 text-sm transition-colors"
-            :class="
-              isActive(item)
-                ? 'bg-[var(--accent)] text-white'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
-            "
-          >
-            {{ item.label }}
-          </RouterLink>
-        </nav>
-
-        <!-- boton nav mobile -->
         <button
           type="button"
           class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-page)] text-[var(--text-secondary)] transition hover:border-[var(--accent)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] md:hidden"
@@ -150,6 +152,18 @@ onBeforeUnmount(() => {
           <X v-if="mobileNavOpen" class="h-4 w-4" />
           <Menu v-else class="h-4 w-4" />
         </button>
+
+        <nav :class="navWrapperClass">
+          <RouterLink
+            v-for="item in navItems"
+            :key="item.name"
+            :to="item.to"
+            :class="[navLinkBaseClass, navLinkClass(item)]"
+            @click="closeMobileNav"
+          >
+            {{ item.label }}
+          </RouterLink>
+        </nav>
 
         <button
           type="button"
@@ -229,30 +243,5 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-
-    <!-- nav mobile -->
-    <transition name="fade">
-      <div
-        v-if="mobileNavOpen"
-        class="border-t border-[var(--border-default)] bg-[var(--bg-surface)] px-4 py-3 md:hidden"
-      >
-        <nav class="flex flex-col gap-2">
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.name"
-            :to="item.to"
-            class="rounded-lg px-3 py-2 text-sm transition-colors"
-            :class="
-              isActive(item)
-                ? 'bg-[var(--accent)] text-white'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
-            "
-            @click="closeMobileNav"
-          >
-            {{ item.label }}
-          </RouterLink>
-        </nav>
-      </div>
-    </transition>
   </header>
 </template>
