@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Prioridad;
 use App\Models\Tarea;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -39,7 +40,7 @@ class TareaFactory extends Factory
             'descripcion' => fake()->randomElement($descripciones),
             'estado' => fake()->randomElement($estados),
             'fecha_vencimiento' => fake()->optional()->dateTimeBetween('-2 days', '+10 days'),
-            'prioridad_id' => fake()->numberBetween(1, 3),
+            'prioridad_id' => Prioridad::factory(),
         ];
     }
 }
