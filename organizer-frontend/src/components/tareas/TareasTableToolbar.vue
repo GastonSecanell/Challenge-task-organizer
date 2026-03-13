@@ -124,19 +124,17 @@ function updateFilter(key, value) {
         </div>
 
         <div class="relative w-[170px] shrink-0">
-          <div class="relative w-[170px] shrink-0">
-            <BaseSelect
-              :model-value="filters.estado"
-              :options="TASK_ESTADO_FILTER_OPTIONS"
-              option-label="label"
-              option-value="value"
-              placeholder="Todos los estados"
-              @update:modelValue="updateFilter('estado', $event)"
-            />
-          </div>
+          <BaseSelect
+            :model-value="filters.estado"
+            :options="TASK_ESTADO_FILTER_OPTIONS"
+            option-label="label"
+            option-value="value"
+            placeholder="Todos los estados"
+            @update:modelValue="updateFilter('estado', $event)"
+          />
         </div>
 
-        <div class="relative w-[200px] shrink-0">
+        <div class="relative w-[220px] shrink-0">
           <input
             :value="filters.fecha_vencimiento"
             type="date"
