@@ -245,27 +245,71 @@ phpmyadmin
 
 ## 1 - Clonar repositorio
 
-git clone <repo>  
-cd challenge-task-organizer
+    git clone <repo>  
+    cd challenge-task-organizer
 
 ---
 
-## 2 - Levantar entorno con Docker
+## 2 - Configuración de entorno (.env)
 
-docker compose up
+Antes de levantar el proyecto es necesario crear el archivo de configuración de entorno.
 
-recomindo
- 
-docker compose up --build
+Dentro de la carpeta backend copiar el archivo .env.example y renombrarlo a .env.
+
+    cd backend
+    cp .env.example .env
+
+Este archivo contiene la configuración necesaria para conectarse a la base de datos y ejecutar Laravel correctamente dentro de Docker.
+
+En este challenge no es necesario modificar ninguna variable, ya que el entorno Docker utiliza valores preconfigurados.
+
+Ejemplo de configuración utilizada:
+
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=task_organizer
+    DB_USERNAME=task_user
+    DB_PASSWORD=passwordtask
+
+Una vez creado el .env, se puede continuar con el levantamiento del entorno.
+
+##  3 - Volver a la carpeta raíz del proyecto
+
+Luego de crear el archivo .env, regresar a la carpeta principal del proyecto.
+
+    cd ..
+
+La estructura del proyecto debe quedar así:
+
+    challenge-task-organizer
+    ├ backend
+    ├ frontend
+    ├ docker
+    ├ postman
+    └ docker-compose.yml
+
+## 4 - Levantar entorno con Docker
+
+Desde la carpeta raíz del proyecto, ejecutar:
+
+    docker compose up
+
+Se recomienda ejecutar:
+
+    docker compose up --build
+
+Esto construirá las imágenes nuevamente en caso de ser necesario.
 
 Durante el arranque se ejecuta automáticamente:
 
-- instalación de dependencias
-- generación de APP_KEY
-- migraciones
-- seeders de datos iniciales
+✔ instalación de dependencias
 
----
+✔ generación de APP_KEY
+
+✔ migraciones de base de datos
+
+✔ seeders con datos iniciales
 
 # Accesos
 
@@ -293,13 +337,13 @@ Se incluyen datos iniciales mediante seeders.
 
 Usuario administrador:
 
-email: admin@tareas.local.com  
-password: administrador
+    email: admin@tareas.local.com  
+    password: administrador
 
 Usuario consulta:
 
-email: consult@tareas.local.com  
-password: consulta
+    email: consult@tareas.local.com  
+    password: consulta
 
 ---
 
@@ -307,12 +351,12 @@ password: consulta
 
 Endpoints principales:
 
-GET    /api/tareas  
-GET    /api/tareas/{id}  
-POST   /api/tareas  
-PUT    /api/tareas/{id}  
-DELETE /api/tareas/{id}  
-PATCH  /api/tareas/{id}/estado  
+    GET    /api/tareas  
+    GET    /api/tareas/{id}  
+    POST   /api/tareas  
+    PUT    /api/tareas/{id}  
+    DELETE /api/tareas/{id}  
+    PATCH  /api/tareas/{id}/estado  
 
 ---
 
