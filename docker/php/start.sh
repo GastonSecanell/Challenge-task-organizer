@@ -1,8 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "MySQL listo"
-echo "Preparando directorios Laravel..."
+echo "Esperando MySQL..."
 until php -r "try { new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD')); echo 'MySQL listo'; } catch (Exception \$e) { exit(1); }"; do
   sleep 2
 done
@@ -45,9 +44,6 @@ php artisan db:seed --force
 echo "Limpiando cachés..."
 php artisan optimize:clear || true
 
-echo "Levantando PHP-FPM..."
-exec php-fpm
-
 echo ""
 echo "=============================================="
 echo "   Task Organizer listo para usar en desarrollo"
@@ -64,3 +60,6 @@ echo "   ¡Gracias por revisar el proyecto!"
 echo "   Esperamos que lo disfruten."
 echo "=============================================="
 echo ""
+
+echo "Levantando PHP-FPM..."
+exec php-fpm

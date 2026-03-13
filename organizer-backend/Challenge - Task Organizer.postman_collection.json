@@ -1,0 +1,573 @@
+{
+	"info": {
+		"_postman_id": "70a55949-de72-4390-b973-c75decb80275",
+		"name": "Challenge - Task Organizer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23540795"
+	},
+	"item": [
+		{
+			"name": "Tareas",
+			"item": [
+				{
+					"name": "Listar tareas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/tareas?estado=pendiente&fecha_vencimiento=2026-03-15",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas"
+							],
+							"query": [
+								{
+									"key": "por_pagina",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "busqueda",
+									"value": "test",
+									"disabled": true
+								},
+								{
+									"key": "estado",
+									"value": "pendiente"
+								},
+								{
+									"key": "prioridad_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "ordenar_por",
+									"value": "titulo",
+									"disabled": true
+								},
+								{
+									"key": "direccion",
+									"value": "asc",
+									"disabled": true
+								},
+								{
+									"key": "fecha_vencimiento",
+									"value": "2026-03-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear tarea",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Primera tarea\",\n  \"descripcion\": \"Descripción de prueba\",\n  \"estado\": \"pendiente\",\n  \"fecha_vencimiento\": \"2026-03-15\",\n  \"prioridad_id\": 1,\n  \"etiquetas\": [1, 2]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/tareas",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ver tarea",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/tareas/{{tarea_id}}",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas",
+								"{{tarea_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar tarea",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Primera tarea editada\",\n  \"descripcion\": \"Descripción editada\",\n  \"estado\": \"en_progreso\",\n  \"fecha_vencimiento\": \"2026-03-18\",\n  \"prioridad_id\": 2,\n  \"etiquetas\": [2, 3]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/tareas/{{tarea_id}}",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas",
+								"{{tarea_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar tarea",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/tareas/{{tarea_id}}",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas",
+								"{{tarea_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar estado de tarea",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"completada\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/tareas/{{tarea_id}}/estado",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"tareas",
+								"{{tarea_id}}",
+								"estado"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Prioridades",
+			"item": [
+				{
+					"name": "Listar prioridades",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/prioridades",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"prioridades"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Etiquetas",
+			"item": [
+				{
+					"name": "Listar etiquetas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/etiquetas",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"etiquetas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuario",
+			"item": [
+				{
+					"name": "Listar usuarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/users",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"administrador2@tareas.local.com\",\n  \"name\": \"Administrador Dos\",\n  \"password\": \"administrador\",\n  \"password_confirmation\": \"administrador\",\n  \"role_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/users",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar usuario",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Administrador Dos Editado\",\n  \"email\": \"administrador2@tareas.local.com\",\n  \"role_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/users/{{user_id}}",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar usuario",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/users/{{user_id}}",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/roles",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const response = pm.response.json();",
+									"const token = response?.data?.token || response?.token || '';",
+									"if (token) {",
+									"  pm.collectionVariables.set('token', token);",
+									"  pm.environment.set('token', token);",
+									"}",
+									"pm.test('Login responde 200', function () {",
+									"  pm.response.to.have.status(200);",
+									"});"
+								],
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@tareas.local.com\",\n    \"password\": \"administrador\"\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/login",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{local}}/api/logout",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "local",
+			"value": "http://127.0.0.1:8000"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "tarea_id",
+			"value": "1"
+		},
+		{
+			"key": "user_id",
+			"value": "2"
+		}
+	]
+}
