@@ -100,18 +100,6 @@ function updateFilter(key, value) {
         class="flex items-center gap-4 overflow-hidden transition-[max-height,opacity] duration-300"
         :class="showFilters ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'"
       >
-        <div class="relative w-[170px] shrink-0">
-          <div class="relative w-[170px] shrink-0">
-            <BaseSelect
-              :model-value="filters.estado"
-              :options="TASK_ESTADO_FILTER_OPTIONS"
-              option-label="label"
-              option-value="value"
-              placeholder="Todos los estados"
-              @update:modelValue="updateFilter('estado', $event)"
-            />
-          </div>
-        </div>
 
         <div class="relative w-[190px] shrink-0">
           <BaseSelect
@@ -133,6 +121,19 @@ function updateFilter(key, value) {
             placeholder="Todas las etiquetas"
             @update:modelValue="updateFilter('etiqueta_id', $event)"
           />
+        </div>
+
+        <div class="relative w-[170px] shrink-0">
+          <div class="relative w-[170px] shrink-0">
+            <BaseSelect
+              :model-value="filters.estado"
+              :options="TASK_ESTADO_FILTER_OPTIONS"
+              option-label="label"
+              option-value="value"
+              placeholder="Todos los estados"
+              @update:modelValue="updateFilter('estado', $event)"
+            />
+          </div>
         </div>
 
         <div class="relative w-[200px] shrink-0">

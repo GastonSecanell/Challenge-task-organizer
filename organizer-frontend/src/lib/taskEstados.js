@@ -24,7 +24,7 @@ export const TASK_ESTADOS = [
   },
 ]
 export const TASK_ESTADO_FILTER_OPTIONS = [
-  { value: '', label: 'Todos los estados' },
+  
   ...TASK_ESTADOS.map((item) => ({
     value: item.value,
     label: item.label,
