@@ -311,6 +311,36 @@ Durante el arranque se ejecuta automáticamente:
 
 ✔ seeders con datos iniciales
 
+## Posible inconveniente al ejecutar en Windows
+
+En algunos entornos Windows, Docker puede mostrar este error al iniciar el contenedor task_php:
+
+    /usr/local/bin/docker-php-entrypoint: 9: exec: /usr/local/bin/start.sh: not found
+
+Esto suele deberse al formato de finales de línea del archivo docker/php/start.sh.
+
+Solución rápida
+
+Abrir el archivo:
+
+    docker/php/start.sh
+
+y cambiar el formato de fin de línea de CRLF a LF.
+
+En VS Code:
+
+abrir start.sh
+
+en la esquina inferior derecha de la aplicacion VS Code, hacer clic en CRLF
+
+cambiar a LF
+
+guardar el archivo
+
+Luego volver a ejecutar:
+
+    docker compose up --build
+
 # Accesos
 
 ### Backend API
