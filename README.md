@@ -254,6 +254,10 @@ cd challenge-task-organizer
 
 docker compose up
 
+recomindo
+ 
+docker compose up --build
+
 Durante el arranque se ejecuta automáticamente:
 
 - instalación de dependencias
