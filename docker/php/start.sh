@@ -47,3 +47,20 @@ php artisan optimize:clear || true
 
 echo "Levantando PHP-FPM..."
 exec php-fpm
+
+echo ""
+echo "=============================================="
+echo "   Task Organizer listo para usar en desarrollo"
+echo ""
+echo "   Backend API  : http://localhost:8000"
+echo "   Frontend     : http://localhost:5173"
+echo "   phpMyAdmin   : http://localhost:8081"
+echo ""
+echo "   Usuario admin:"
+echo "   admin@tareas.local.com"
+echo "   administrador"
+echo ""
+echo "   ¡Gracias por revisar el proyecto!"
+echo "   Esperamos que lo disfruten."
+echo "=============================================="
+echo ""
